@@ -26,7 +26,9 @@ export function UTCDateInput(
     const [formValue, setFormValue] = useState(value as Date | undefined)
     const hiddenRef = useRef(null as HTMLInputElement | null)
     const dateNow = new Date()
-    const minDate = value === undefined ? dateNow : value > dateNow ? dateNow : value // the minimum date that can be selected
+    const minDate = value === undefined ? dateNow 
+        : value > dateNow ? dateNow 
+        : value // the minimum date that can be selected
     minDate.setHours(0, 0, 0, 0)
 
     return (
