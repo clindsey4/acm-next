@@ -4,6 +4,14 @@
 import { dateToDateInputValue } from "@/lib/utils"
 import { useRef, useState } from "react"
 
+function safeToISOString(date: Date): string | undefined {
+    try {
+        return date.toISOString()
+    } catch (error) {
+        return undefined
+    }
+}
+
 export function UTCDateInput(
     {
         name,
@@ -17,12 +25,13 @@ export function UTCDateInput(
 ) {
     const [formValue, setFormValue] = useState(value as Date | undefined)
     const hiddenRef = useRef(null as HTMLInputElement | null)
-    const minDate = value === undefined ? new Date() : value // the minimum date that can be selected
+    const dateNow = new Date()
+    const minDate = value === undefined ? dateNow : value > dateNow ? dateNow : value // the minimum date that can be selected
     minDate.setHours(0, 0, 0, 0)
 
     return (
         <>
-            <input type='text' name={name} ref={hiddenRef} value={formValue ? formValue.toISOString() : undefined} hidden />
+            <input type='text' name={name} ref={hiddenRef} value={formValue ? safeToISOString(formValue) : undefined} hidden />
             <input
                 type='datetime-local'
                 className="text-lg text-on-surface px-5 py-2 bg-surface-container rounded-full"

@@ -3,15 +3,23 @@ import { BaseButton } from "@/components/material/base-button"
 import { Divider } from "@/components/material/divider"
 import { PageHeader } from "@/components/page-header"
 import { PageSelector } from "@/components/page-selector"
-import { Event } from "@/data/types"
-import { filterEventsAttendance, getEvent } from "@/data/webData"
+import { Event, Semester } from "@/data/types"
+import { filterEventsAttendance, filterEventsAttendancePoints, getEvent } from "@/data/webData"
 import { getActiveSession } from "@/lib/oauth"
 import { Locale, getDictionary } from "@/localization"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import { FutureEventItem } from "../events/page"
+import { getMaximumSemesterDate, getMinimumSemesterDate, getSemester } from "@/lib/utils"
+import { InputSection } from "@/components/input/input-section"
 
 const entriesPerPage = 30
+
+interface AttendanceSemester {
+    date: Date
+    semester: Semester
+    items: Event[]
+}
 
 export default async function AccountPage(
     {
@@ -41,8 +49,20 @@ export default async function AccountPage(
     const firstName = user.givenName
     const email = user.email
 
+    // handle date/semester stuff
+    const dateNow = new Date()
+    const currentSemester = getSemester(dateNow)
+    const minSemesterDate = getMinimumSemesterDate(currentSemester)
+    const maxSemesterDate = getMaximumSemesterDate(currentSemester)
+
     // get the user's attendance points for this semester
-    const attendancePoints = 0
+    const attendancePointsResult = await filterEventsAttendancePoints({
+        userEmails: [email],
+        maxEntries: 1,
+        fromDate: minSemesterDate,
+        toDate: maxSemesterDate
+    })
+    const attendancePointsTotal = attendancePointsResult.results[0]?.points || 0
 
     // parse search params
     const currentPage = Math.max(Number.parseInt(searchParams.page) || 0, 0) // parse the page search parameter, ensuring that it is >= 1
@@ -54,11 +74,34 @@ export default async function AccountPage(
         offset: currentOffset,
         maxEntries: entriesPerPage
     })
-    const attendanceEvents: Event[] = []
-    for (const attendance of attendanceResult.results) {
-        const event = await getEvent(attendance.eventId)
-        if (event) {
-            attendanceEvents.push(event)
+    const attendanceSemesters: AttendanceSemester[] = []
+    {
+        let currentSemester: AttendanceSemester | null = null
+
+        for (const attendance of attendanceResult.results) {
+            const event = await getEvent(attendance.eventId)
+            if (event) {
+                const semester = getSemester(event.endDate)
+                const minSemesterDate = getMinimumSemesterDate(semester, event.endDate)
+
+                if (currentSemester !== null) {
+                    if (currentSemester.semester !== semester || currentSemester.date.getFullYear() !== minSemesterDate.getFullYear()) {
+                        attendanceSemesters.push(currentSemester)
+                        currentSemester = null
+                    } else {
+                        currentSemester.items.push(event)
+                    }
+                } else {
+                    currentSemester = {
+                        date: minSemesterDate,
+                        semester: semester,
+                        items: [event]
+                    }
+                }
+            }
+        }
+        if (currentSemester !== null) {
+            attendanceSemesters.push(currentSemester)
         }
     }
 
@@ -86,7 +129,7 @@ export default async function AccountPage(
                 </section>
 
                 {/* Attendance points */}
-                <h3 className="rounded-full border border-on-surface text-on-surface font-semibold text-base h-10 px-6 flex items-center">{langDict.account_attendance_points.replace(":points", attendancePoints.toString())}</h3>
+                <h3 className="rounded-full border border-on-surface text-on-surface font-semibold text-base h-10 px-6 flex items-center">{langDict.account_attendance_points.replace(":points", attendancePointsTotal.toString())}</h3>
 
                 {/* log out */}
                 <BaseButton
@@ -102,7 +145,10 @@ export default async function AccountPage(
             <Divider />
             {currentPage === 0 && 0 >= attendanceResult.totalCount ? <h3 className="text-center w-full text-2xl">{langDict.account_attendance_empty}</h3>
                 : <ul className="flex flex-col gap-5">
-                    {attendanceEvents.map(event => <FutureEventItem key={event.id} event={event}/>)}
+                    {attendanceSemesters.map(semester => <InputSection
+                        key={semester.date.toISOString()}
+                        title={`${semester.semester == Semester.SPRING ? 'Spring' : 'Fall'} ${semester.date.getFullYear()}`}
+                    >{semester.items.map(event => <FutureEventItem key={event.id} event={event}/>)}</InputSection>)}
                     <li><PageSelector
                         currentOffset={currentOffset}
                         totalCount={attendanceResult.totalCount}
