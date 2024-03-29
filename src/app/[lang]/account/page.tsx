@@ -87,7 +87,11 @@ export default async function AccountPage(
                 if (currentSemester !== null) {
                     if (currentSemester.semester !== semester || currentSemester.date.getFullYear() !== minSemesterDate.getFullYear()) {
                         attendanceSemesters.push(currentSemester)
-                        currentSemester = null
+                        currentSemester = {
+                            date: minSemesterDate,
+                            semester: semester,
+                            items: [event]
+                        }
                     } else {
                         currentSemester.items.push(event)
                     }
@@ -147,7 +151,7 @@ export default async function AccountPage(
                 : <ul className="flex flex-col gap-5">
                     {attendanceSemesters.map(semester => <InputSection
                         key={semester.date.toISOString()}
-                        title={`${semester.semester == Semester.SPRING ? 'Spring' : 'Fall'} ${semester.date.getFullYear()}`}
+                        title={(semester.semester == Semester.SPRING ? langDict.account_spring_event : langDict.account_fall_event).replace(":year", semester.date.getFullYear().toString())}
                     >{semester.items.map(event => <FutureEventItem key={event.id} event={event}/>)}</InputSection>)}
                     <li><PageSelector
                         currentOffset={currentOffset}

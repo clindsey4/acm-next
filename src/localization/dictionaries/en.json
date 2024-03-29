@@ -60,5 +60,7 @@
     "account_log_out": "Log Out",
     "account_attendance_title": "Attendance History",
     "account_attendance_points": ":points attendance points",
-    "account_attendance_empty": "You have not attended any events."
+    "account_attendance_empty": "You have not attended any events.",
+    "account_spring_event": "Spring :year",
+    "account_fall_event": "Fall :year"
 }

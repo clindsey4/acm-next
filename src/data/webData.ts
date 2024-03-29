@@ -1183,8 +1183,8 @@ function filterEventsAttendanceSync(
     WHERE (:fromDate IS NULL OR events.end_date > :fromDate)
         AND (:toDate IS NULL OR :toDate >= events.end_date)${eventIdsStatement}${userEmailsStatement}
     ORDER BY
-        CASE WHEN :direction = 0 THEN 1 ELSE start_date END ASC,
-        CASE WHEN :direction = 1 THEN 1 ELSE start_date END DESC
+        CASE WHEN :direction = 0 THEN 1 ELSE end_date END ASC,
+        CASE WHEN :direction = 1 THEN 1 ELSE end_date END DESC
     LIMIT :maxEntries
     OFFSET :offset`).all(queryParams) as RawFilterEventAttendance[]
 
@@ -1240,8 +1240,8 @@ function filterEventsAttendancePointsSync(
         AND (:toDate IS NULL OR :toDate >= events.end_date)
         AND (:type IS NULL OR :type = event_types.id)${eventIdsStatement}${userEmailsStatement}
     ORDER BY
-        CASE WHEN :direction = 0 THEN 1 ELSE start_date END ASC,
-        CASE WHEN :direction = 1 THEN 1 ELSE start_date END DESC
+        CASE WHEN :direction = 0 THEN 1 ELSE end_date END ASC,
+        CASE WHEN :direction = 1 THEN 1 ELSE end_date END DESC
     LIMIT :maxEntries
     OFFSET :offset`).all(queryParams) as RawEventsAttendancePointsFilterResult[]
 
