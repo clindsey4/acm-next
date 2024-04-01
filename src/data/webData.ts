@@ -1,6 +1,6 @@
 import { randomBytes } from "crypto";
 import getDatabase from ".";
-import { AccessLevel, Databases, RawUser, User, RawSession, Session, RawNews, News, EventType, Id, RawEvent, Event, EventFilterParams, FilterDirection, EventFilterResult, RawFilterEvent, RawEventAttendance, EventAttendance, EventsAttendanceFilterParams, EventsAttendanceFilterResult, RawFilterEventAttendance } from "./types";
+import { AccessLevel, Databases, RawUser, User, RawSession, Session, RawNews, News, EventType, Id, RawEvent, Event, EventFilterParams, FilterDirection, EventFilterResult, RawFilterEvent, RawEventAttendance, EventAttendance, EventsAttendanceFilterParams, EventsAttendanceFilterResults, RawFilterEventAttendance, EventsAttendancePointsFilterParams, EventsAttendancePointsFilterResults, RawEventsAttendancePointsFilterResult, EventsAttendancePointsFilterResult } from "./types";
 
 
 // import database
@@ -1160,7 +1160,7 @@ function buildEventAttendance(
  */
 function filterEventsAttendanceSync(
     filterParams: EventsAttendanceFilterParams
-): EventsAttendanceFilterResult {
+): EventsAttendanceFilterResults {
 
     const queryParams: { [key: string]: any } = {
         fromDate: filterParams.fromDate ? filterParams.fromDate.toISOString() : null,
@@ -1183,8 +1183,8 @@ function filterEventsAttendanceSync(
     WHERE (:fromDate IS NULL OR events.end_date > :fromDate)
         AND (:toDate IS NULL OR :toDate >= events.end_date)${eventIdsStatement}${userEmailsStatement}
     ORDER BY
-        CASE WHEN :direction = 0 THEN 1 ELSE start_date END ASC,
-        CASE WHEN :direction = 1 THEN 1 ELSE start_date END DESC
+        CASE WHEN :direction = 0 THEN 1 ELSE end_date END ASC,
+        CASE WHEN :direction = 1 THEN 1 ELSE end_date END DESC
     LIMIT :maxEntries
     OFFSET :offset`).all(queryParams) as RawFilterEventAttendance[]
 
@@ -1202,10 +1202,72 @@ function filterEventsAttendanceSync(
  */
 export function filterEventsAttendance(
     filterParams: EventsAttendanceFilterParams
-): Promise<EventsAttendanceFilterResult> {
+): Promise<EventsAttendanceFilterResults> {
     return new Promise((resolve, reject) => {
         try {
             resolve(filterEventsAttendanceSync(filterParams))
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+function filterEventsAttendancePointsSync(
+    filterParams: EventsAttendancePointsFilterParams
+): EventsAttendancePointsFilterResults {
+
+    const queryParams: { [key: string]: any } = {
+        fromDate: filterParams.fromDate ? filterParams.fromDate.toISOString() : null,
+        toDate: filterParams.toDate ? filterParams.toDate.toISOString() : null,
+        offset: filterParams.offset || 0,
+        maxEntries: filterParams.maxEntries || 50,
+        type: filterParams.type === undefined ? null : filterParams.type,
+        direction: filterParams.direction == undefined ? FilterDirection.DESCENDING : filterParams.direction
+    }
+
+    const eventIdsValues = filterParams.eventIds ? buildInStatement(filterParams.eventIds, queryParams, "eventIds") : null
+    const userEmailsValues = filterParams.userEmails ? buildInStatement(filterParams.userEmails, queryParams, "userEmails") : null
+
+    const eventIdsStatement = eventIdsValues ? ` AND (event_id IN (${eventIdsValues}))` : ''
+    const userEmailsStatement = userEmailsValues ? ` AND (user_email IN (${userEmailsValues}))` : ''
+
+    const dbResult = db.prepare(`
+    SELECT user_email, SUM(event_types.points) AS points, COUNT(*) OVER() as total_count
+    FROM events_attendance
+    INNER JOIN events ON events.id = event_id
+    INNER JOIN event_types ON event_types.id = events.type
+    WHERE (:fromDate IS NULL OR events.end_date > :fromDate)
+        AND (:toDate IS NULL OR :toDate >= events.end_date)
+        AND (:type IS NULL OR :type = event_types.id)${eventIdsStatement}${userEmailsStatement}
+    ORDER BY
+        CASE WHEN :direction = 0 THEN 1 ELSE end_date END ASC,
+        CASE WHEN :direction = 1 THEN 1 ELSE end_date END DESC
+    LIMIT :maxEntries
+    OFFSET :offset`).all(queryParams) as RawEventsAttendancePointsFilterResult[]
+
+    const results: EventsAttendancePointsFilterResult[] = []
+    for (const raw of dbResult) {
+        const user = getUserSync(raw.user_email)
+        if (user) {
+            results.push({
+                user: user,
+                points: raw.points
+            })
+        }
+    }
+
+    return {
+        totalCount: dbResult[0] ? dbResult[0].total_count : 0,
+        results: results
+    }
+}
+
+export function filterEventsAttendancePoints(
+    filterParams: EventsAttendancePointsFilterParams
+): Promise<EventsAttendancePointsFilterResults> {
+    return new Promise<EventsAttendancePointsFilterResults>((resolve, reject) => {
+        try {
+            resolve(filterEventsAttendancePointsSync(filterParams))   
         } catch (error) {
             reject(error)
         }

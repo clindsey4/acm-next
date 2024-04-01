@@ -151,7 +151,34 @@ export interface EventsAttendanceFilterParams {
     direction?: FilterDirection
 }
 
-export interface EventsAttendanceFilterResult {
+export interface EventsAttendanceFilterResults {
     totalCount: number,
     results: EventAttendance[]
+}
+
+export interface EventsAttendancePointsFilterParams {
+    eventIds?: Id[],
+    userEmails?: string[],
+    fromDate?: Date
+    toDate?: Date
+    type?: EventType
+    offset?: number
+    maxEntries?: number
+    direction?: FilterDirection
+}
+
+export interface EventsAttendancePointsFilterResults {
+    totalCount: number,
+    results: EventsAttendancePointsFilterResult[]
+}
+
+export interface RawEventsAttendancePointsFilterResult {
+    user_email: string,
+    points: number,
+    total_count: number
+}
+
+export interface EventsAttendancePointsFilterResult {
+    user: User,
+    points: number
 }
