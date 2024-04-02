@@ -1,4 +1,5 @@
 import { Event, Semester } from "@/data/types"
+import { MutableRefObject } from "react"
 
 export function dateToDateInputValue(
     date: Date
@@ -65,4 +66,24 @@ export function getMaximumSemesterDate(
     date.setHours(23,59,59, 0)
 
     return date
+}
+
+/**
+ * Only calls callback after 'timeout' milliseconds.
+ * If called multiple times, only the most recent callback will be called.
+ * 
+ * @param ref The ref to a timeout to keep track of the callback timeout.
+ * @param timeout In milliseconds, how long to wait before calling callback.
+ * @param callback The callback function to call.
+ */
+export function timeoutDebounce(
+    ref: MutableRefObject<NodeJS.Timeout | undefined>,
+    timeout: number,
+    callback: () => void
+) {
+    if (ref) {
+        clearTimeout(ref.current)
+    }
+
+    ref.current = setTimeout(callback, timeout)
 }
