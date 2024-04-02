@@ -62,5 +62,11 @@
     "account_attendance_points": "",
     "account_attendance_empty": "",
     "account_spring_event": "",
-    "account_fall_event": ""
+    "account_fall_event": "",
+    "language_english": "",
+    "language_german": "",
+    "language_french": "",
+    "theme_system": "",
+    "theme_dark": "",
+    "theme_light": ""
 }

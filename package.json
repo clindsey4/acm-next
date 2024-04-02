@@ -12,6 +12,7 @@
     "@formatjs/intl-localematcher": "^0.5.4",
     "@tailwindcss/typography": "^0.5.10",
     "better-sqlite3": "^9.4.3",
+    "cookies-next": "^4.1.1",
     "crypto-js": "^4.2.0",
     "google-auth-library": "^9.6.3",
     "material-symbols": "^0.15.0",
