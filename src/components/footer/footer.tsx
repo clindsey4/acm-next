@@ -1,43 +1,22 @@
-'use client'
-
+import { Locale, getDictionary } from "@/localization";
 import Link from "next/link";
-import { useLocale } from "../providers/language-dict-provider"
 import Image from "../image";
-import { LanguageDictionaryKey, Locale, langLocaleTokens, locales } from "@/localization";
-import { Icon } from "../material/icon";
 import { Divider } from "../material/divider";
-import { FooterSelect } from "./footer-select";
-import { usePathname, useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
+import { FooterSettings } from "./footer-settings";
+import { Settings } from "@/lib/settings";
+import { cookies } from "next/headers";
 
-export default function Footer(
+export default async function Footer(
     {
         lang
     }: {
         lang: Locale
     }
 ) {
-    const langDict = useLocale();
-    
-    // theme variables
-    const theme = useTheme();
-
-    // path variables
+    const langDict = await getDictionary(lang)
     const root = `/${lang}`
-    const pathName = usePathname()
-    const router = useRouter()
+    const settings = new Settings(cookies())
     
-    // select option stuff
-    let selectedLocale = 0
-    const localeOptions: string[] = []
-    const localeSubOptions: string[] = []
-
-    for (const locale in langLocaleTokens) {
-        if (locale === lang) selectedLocale = localeOptions.length
-        localeOptions.push(langDict[langLocaleTokens[locale as keyof typeof langLocaleTokens]])
-        localeSubOptions.push(langDict[`${langLocaleTokens[locale as keyof typeof langLocaleTokens]}_local` as LanguageDictionaryKey])
-    }
-
     return (
         <footer>
             <Divider/>
@@ -60,29 +39,10 @@ export default function Footer(
                 </li>
                 <li className="w-full">
                     <ul className="gap-3 flex flex-col sm:flex-row justify-center items-center">
-                        {/* Language */}
-                        <FooterSelect
-                            value={selectedLocale}
-                            options={localeOptions}
-                            optionSubtitles={localeSubOptions}
-                            icon="language"
-                            onValueChanged={newValue => {
-                                const newLang = locales[newValue]
-                                router.push(pathName.replace(lang, newLang));
-                            }}
-                        />
-
-                        {/* Theme */}
-                        <FooterSelect
-                            value={theme.theme === 'system' ? 0 : theme.theme === 'dark' ? 1 : 2}
-                            options={[
-                                langDict['theme_system'],
-                                langDict['theme_dark'],
-                                langDict['theme_light']
-                            ]}
-                            icon="dark_mode"
-                            onValueChanged={newValue => {
-                                theme.setTheme(newValue === 0 ? 'system' : newValue === 1 ? 'dark' : 'light')
+                        <FooterSettings
+                            initialSettings={{
+                                lang: lang,
+                                theme: settings.theme
                             }}
                         />
                     </ul>
