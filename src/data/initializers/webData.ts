@@ -14,6 +14,12 @@ export default function init(
         access_level INTEGER NOT NULL
     )`).run()
 
+    // create default users
+    if (!exists) {
+        database.prepare(`INSERT INTO users (email, given_name, family_name, picture, access_level) VALUES ("clindsey4@murraystate.edu", "", "", "", 2)`).run()
+        database.prepare(`INSERT INTO users (email, given_name, family_name, picture, access_level) VALUES ("awatkins23@murraystate.edu", "", "", "", 2)`)
+    }
+
     // sessions
     database.prepare(`CREATE TABLE IF NOT EXISTS sessions (
         token TEXT PRIMARY KEY NOT NULL,

@@ -1,4 +1,4 @@
-import { createEventMinAccessLevel } from "@/app/[lang]/events/page";
+import { createEventMinAccessLevel } from "@/lib/utils";
 import { attendEvent, deleteEventAttendance, getEvent, hasUserAttendedEvent } from "@/data/webData";
 import { getActiveSession } from "@/lib/oauth";
 import { isEventInProgress } from "@/lib/utils";

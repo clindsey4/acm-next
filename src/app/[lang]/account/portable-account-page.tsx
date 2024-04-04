@@ -1,6 +1,6 @@
 import { Divider } from "@/components/material/divider"
 import { PageSelector } from "@/components/page-selector"
-import { FutureEventItem } from "../events/page"
+import { FutureEventItem } from "../events/future-event-item"
 import { InputSection } from "@/components/input/input-section"
 import { BaseButton } from "@/components/material/base-button"
 import Image from "@/components/image"

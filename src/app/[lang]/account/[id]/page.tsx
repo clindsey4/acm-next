@@ -3,7 +3,7 @@ import { getActiveSession } from "@/lib/oauth"
 import { Locale, getDictionary } from "@/localization"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
-import { viewAnyAccountMinAccessLevel } from "../../events/page"
+import { viewAnyAccountMinAccessLevel } from "@/lib/utils"
 import { PortableAccountPage } from "../portable-account-page"
 
 export default async function AnyAccountPage(
