@@ -84,6 +84,7 @@ export default async function EventsPage(
                             text={langDict.events_attend}
                             href={`/api/events/attend?id=${event.id}`}
                             className="w-full sm:w-fit"
+                            prefetch={false}
                         /> : undefined}
                         {canCreateEvents ? <>
                             <FilledButton

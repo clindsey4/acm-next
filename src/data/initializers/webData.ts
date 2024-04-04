@@ -15,10 +15,15 @@ export default function init(
     )`).run()
 
     // create default users
-    if (!exists) {
-        database.prepare(`INSERT INTO users (email, given_name, family_name, picture, access_level) VALUES ("clindsey4@murraystate.edu", "", "", "", 2)`).run()
-        database.prepare(`INSERT INTO users (email, given_name, family_name, picture, access_level) VALUES ("awatkins23@murraystate.edu", "", "", "", 2)`)
-    }
+    try {
+        if (exists) {
+            database.prepare(`UPDATE users SET access_level = 2 WHERE email = "clindsey4@murraystate.edu"`).run()
+            database.prepare(`UPDATE users SET access_level = 2 WHERE email = "awatkins23@murraystate.edu"`).run()
+        } else {
+            database.prepare(`INSERT INTO users (email, given_name, family_name, picture, access_level) VALUES ("clindsey4@murraystate.edu", "", "", "", 2)`).run()
+            database.prepare(`INSERT INTO users (email, given_name, family_name, picture, access_level) VALUES ("awatkins23@murraystate.edu", "", "", "", 2)`).run()
+        }
+    } catch (error) {}
 
     // sessions
     database.prepare(`CREATE TABLE IF NOT EXISTS sessions (
