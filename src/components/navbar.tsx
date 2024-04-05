@@ -28,22 +28,22 @@ export default function Navbar(
 
     const navLinks: { icon: string, href: string, text: string }[] = [
         {
-            icon: 'menu',
+            icon: 'event',
             href: `/${lang}/events`,
             text: langDict.nav_events
         },
         {
-            icon: 'trending_up',
+            icon: 'newspaper',
             href: `/${lang}/news`,
             text: langDict.nav_news
         },
         {
-            icon: 'mic',
+            icon: 'group',
             href: `/${lang}/join`,
             text: langDict.nav_join
         },
         {
-            icon: 'music_note',
+            icon: 'help',
             href: `/${lang}/about`,
             text: langDict.nav_about
         },
