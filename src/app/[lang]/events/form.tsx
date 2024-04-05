@@ -126,6 +126,11 @@ export function EventForm(
                 />
             </InputSection>
 
+            <section className="flex sm:hidden flex-col gap-5 w-full">
+                <Divider/>
+                <FilledButton className="w-full" text={actionText} disabled={pending} />
+            </section>
+
         </form>
     )
 }
