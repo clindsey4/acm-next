@@ -129,7 +129,7 @@ export async function PortableAccountPage(
                     icon="logout"
                     text={langDict.account_log_out}
                     className="w-full sm:w-fit bg-error text-on-error before:bg-on-error"
-                    href="/api/logout"
+                    href="/api/logout?refer=/"
                     prefetch={false}
                 /> : undefined}
 

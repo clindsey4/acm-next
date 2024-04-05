@@ -4,7 +4,7 @@ import { NextRequest } from "next/server";
 import { OAuth2Client } from "google-auth-library";
 import { getUser, insertUser, updateUser } from "@/data/webData";
 import { AccessLevel } from "@/data/types";
-import { generateSession, getActiveSession } from "@/lib/oauth";
+import { generateSession, getActiveSession, getEmailDefaultAccessLevel } from "@/lib/oauth";
 
 export async function GET(
     request: NextRequest
@@ -71,12 +71,13 @@ export async function GET(
                     picture: picture
                 })
             } else {
+                // get default access level
                 user = await insertUser({
                     email: email,
                     givenName: givenName,
                     familyName: familyName,
                     picture: picture,
-                    accessLevel: AccessLevel.NON_MEMBER
+                    accessLevel: getEmailDefaultAccessLevel(email)
                 })
             }
 

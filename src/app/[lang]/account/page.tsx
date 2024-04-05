@@ -1,26 +1,8 @@
-import Image from "@/components/image"
-import { BaseButton } from "@/components/material/base-button"
-import { Divider } from "@/components/material/divider"
-import { PageHeader } from "@/components/page-header"
-import { PageSelector } from "@/components/page-selector"
-import { Event, Semester } from "@/data/types"
-import { filterEventsAttendance, filterEventsAttendancePoints, getEvent } from "@/data/webData"
 import { getActiveSession } from "@/lib/oauth"
 import { Locale, getDictionary } from "@/localization"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
-import { FutureEventItem } from "../events/future-event-item"
-import { getMaximumSemesterDate, getMinimumSemesterDate, getSemester } from "@/lib/utils"
-import { InputSection } from "@/components/input/input-section"
 import { PortableAccountPage } from "./portable-account-page"
-
-const entriesPerPage = 30
-
-interface AttendanceSemester {
-    date: Date
-    semester: Semester
-    items: Event[]
-}
 
 export default async function AccountPage(
     {
