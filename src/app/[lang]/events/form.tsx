@@ -80,7 +80,7 @@ export function EventForm(
             </InputSection>
 
             {/* Dates Section */}
-            <section className="flex gap-5">
+            <section className="flex flex-col sm:flex-row gap-5">
                 <InputSection title={langDict.new_event_start_field}>
                     <UTCDateInput
                         name='start-date'
