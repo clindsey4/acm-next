@@ -7,6 +7,7 @@ import { TextInputElement } from "@/components/input/text-input"
 import { UTCDateInput } from "@/components/input/utc-date-input"
 import { Divider } from "@/components/material/divider"
 import { FilledButton } from "@/components/material/filled-button"
+import { PageHeader } from "@/components/page-header"
 import { useLocale } from "@/components/providers/language-dict-provider"
 import { AccessLevel, Id } from "@/data/types"
 import { useFormState, useFormStatus } from "react-dom"
@@ -47,10 +48,10 @@ export function EventForm(
     return (
         <form className="flex flex-col gap-5 w-full" action={formAction}>
             <input type='text' name='id' value={values.id} hidden />
-            <section className="flex gap-5 items-end">
-                <h1 className="text-on-surface md:text-5xl text-4xl font-bold w-full">{title}</h1>
-                <FilledButton text={actionText} disabled={pending} />
-            </section>
+            <PageHeader
+                text={title}
+                actions={<FilledButton className="w-full md:w-fit" text={actionText} disabled={pending} />}
+            />
             <Divider />
 
             {/* Error */}

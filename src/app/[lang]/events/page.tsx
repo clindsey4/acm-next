@@ -16,6 +16,8 @@ import { cookies } from "next/headers"
 import Link from "next/link"
 import { FutureEventItem } from "./future-event-item"
 import { showQRCodeMinAccessLevel, createEventMinAccessLevel } from "@/lib/utils"
+import { PageHeader } from "@/components/page-header"
+import { FloatingActionButton } from "@/components/material/floating-action-button"
 
 const entriesPerPage = 10
 
@@ -74,10 +76,16 @@ export default async function EventsPage(
 
     return (
         <article className="w-full flex flex-col gap-5">
-            <section className="flex gap-5 items-end">
-                <h1 className="text-on-surface md:text-5xl text-4xl font-bold w-full">{langDict.events_title}</h1>
-                {accessLevel >= createEventMinAccessLevel ? <FilledButton text={'Create'} href='./events/create' /> : undefined}
-            </section>
+            <PageHeader
+                text={langDict.events_title}
+                actions={accessLevel >= createEventMinAccessLevel ? <FilledButton className="hidden md:flex" text={langDict.create_post} href='./events/create' /> : undefined}
+            />
+            <FloatingActionButton
+                icon="add"
+                title={langDict.create_post}
+                href="./events/create"
+                className="md:hidden flex"
+            />
             <Divider />
 
             {upcomingEvent ? (
@@ -106,7 +114,7 @@ export default async function EventsPage(
             ) : undefined}
 
             {/* Past Events */}
-            {pastEvents.totalCount === 0 && !upcomingEvent ? <h2 className="w-full text-center text-4xl font-bold mt-5">{langDict.events_empty}</h2>
+            {pastEvents.totalCount === 0 && !upcomingEvent ? <h2 className="w-full text-center text-3xl md:text-4xl font-normal md:font-bold mt-5">{langDict.events_empty}</h2>
                 : (
                     <ul className="flex flex-col gap-5 w-full">{pastEvents.results.map(event => <PastEventItem
                         key={event.id}

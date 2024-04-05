@@ -7,6 +7,8 @@ import { Locale, getDictionary } from "@/localization";
 import { PageHeader } from "@/components/page-header";
 import { getActiveSession } from "@/lib/oauth";
 import { cookies } from "next/headers";
+import { FloatingActionButton } from "@/components/material/floating-action-button";
+import { createNewsMinAccessLevel } from "@/lib/utils";
 
 export default async function Newsfeed(
     {
@@ -56,7 +58,13 @@ export default async function Newsfeed(
         <article className="w-full flex flex-col gap-5">
             <PageHeader
                 text={langDict.nav_news}
-                actions={(accessLevel > AccessLevel.NON_MEMBER)? <FilledButton text={langDict.news_new_post} href="/news/create" /> : <></>}
+                actions={(accessLevel >= createNewsMinAccessLevel)? <FilledButton className="hidden md:flex" text={langDict.news_new_post} href="./news/create" /> : undefined}
+            />
+            <FloatingActionButton
+                icon="add"
+                title={langDict.news_new_post}
+                href="./news/create"
+                className="md:hidden flex"
             />
             <Divider />
             {
