@@ -5,7 +5,7 @@ import { getActiveSession } from "@/lib/oauth"
 import { Locale, getDictionary } from "@/localization"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
-import { createEventMinAccessLevel, showQRCodeMinAccessLevel } from "../page"
+import { createEventMinAccessLevel, showQRCodeMinAccessLevel } from "@/lib/utils"
 import { isEventInProgress } from "@/lib/utils"
 import { BaseButton } from "@/components/material/base-button"
 import { FilledButton } from "@/components/material/filled-button"
@@ -15,6 +15,7 @@ import { IconButton } from "@/components/material/icon-button"
 import { PageSelector } from "@/components/page-selector"
 import { DeleteEventButton } from "./delete-event-button"
 import { DeleteEventAttendanceButton } from "./delete-event-attendance-button"
+import Link from "next/link"
 
 const entriesPerPage = 20
 
@@ -83,6 +84,7 @@ export default async function EventsPage(
                             text={langDict.events_attend}
                             href={`/api/events/attend?id=${event.id}`}
                             className="w-full sm:w-fit"
+                            prefetch={false}
                         /> : undefined}
                         {canCreateEvents ? <>
                             <FilledButton
@@ -114,6 +116,7 @@ export default async function EventsPage(
                                     eventId={eventId}
                                     email={user.email}
                                 />}
+                                href={`/${lang}/account/${user.email.split('@')[0]}`}
                             />)}
                             <li><PageSelector
                                 currentOffset={currentOffset}
@@ -125,10 +128,6 @@ export default async function EventsPage(
                     </section>
                 }
             </> : undefined}
-
-
-
-
         </article>
     )
 
@@ -137,10 +136,12 @@ export default async function EventsPage(
 function AttendanceListItem(
     {
         user,
-        action
+        action,
+        href
     }: {
         user: User
         action: React.ReactNode
+        href: string
     }
 ) {
     return (
@@ -155,7 +156,7 @@ function AttendanceListItem(
                 />
             </figure>
             <section className="flex flex-col">
-                <h4 className="text-xl font-semibold">{user.givenName} {user.familyName}</h4>
+                <Link href={href}><h4 className="text-xl font-semibold hover:text-primary transition-colors">{user.givenName} {user.familyName}</h4></Link>
                 <h5 className="text-base text-on-surface-variant">{user.email}</h5>
             </section>
             <section className="flex-1 flex justify-end">{action}</section>

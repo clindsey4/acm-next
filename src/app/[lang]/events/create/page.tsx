@@ -1,7 +1,7 @@
 import { AccessLevel } from "@/data/types";
 import { getActiveSession } from "@/lib/oauth";
 import { cookies } from "next/headers";
-import { createEventMinAccessLevel } from "../page";
+import { createEventMinAccessLevel } from "@/lib/utils";
 import { redirect } from "next/navigation";
 import { EventForm } from "../form";
 import { SelectInputOption } from "@/components/input/select-input";

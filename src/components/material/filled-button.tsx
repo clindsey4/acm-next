@@ -8,14 +8,16 @@ export function FilledButton(
         href,
         onClick,
         className = '',
-        disabled
+        disabled,
+        prefetch
     }: {
         text: string,
         icon?: string,
         href?: string,
         onClick?: MouseEventHandler,
         className?: string,
-        disabled?: boolean
+        disabled?: boolean,
+        prefetch?: boolean
     }
 ) {
     return (  
@@ -26,6 +28,7 @@ export function FilledButton(
             onClick={onClick}
             className={`bg-primary text-on-primary before:bg-on-primary disabled:before:bg-surface disabled:before:opacity-50 ${className}`}
             disabled={disabled}
+            prefetch={prefetch}
         />
     )
 }

@@ -40,3 +40,6 @@ next-env.d.ts
 
 #uploaded images
 /public/media_images/*
+.dockerignore
+Dockerfile
+fly.toml

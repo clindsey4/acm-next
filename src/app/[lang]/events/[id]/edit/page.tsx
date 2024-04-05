@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { SelectInputOption } from "@/components/input/select-input";
 import { getAllEventTypes, getEvent } from "@/data/webData";
-import { createEventMinAccessLevel } from "../../page";
+import { createEventMinAccessLevel } from "@/lib/utils";
 import { EventForm } from "../../form";
 import { Locale, getDictionary } from "@/localization";
 import { EditEventForm } from "./edit-event-form";

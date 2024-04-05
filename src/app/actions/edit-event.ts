@@ -3,7 +3,7 @@
 import { AccessLevel } from "@/data/types"
 import { getActiveSession } from "@/lib/oauth"
 import { cookies } from "next/headers"
-import { createEventMinAccessLevel } from "../[lang]/events/page"
+import { createEventMinAccessLevel } from "@/lib/utils"
 import { redirect } from "next/navigation"
 import { getEvent, getEventType, updateEvent } from "@/data/webData"
 import { EventActionState } from "./create-event"

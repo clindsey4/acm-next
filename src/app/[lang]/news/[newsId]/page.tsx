@@ -10,7 +10,7 @@ import { FilledButton } from "@/components/material/filled-button"
 import { getActiveSession } from "@/lib/oauth"
 import { AccessLevel } from "@/data/types"
 import { cookies } from "next/headers"
-import { createNewsMinAccessLevel } from "../../events/page"
+import { createNewsMinAccessLevel } from "@/lib/utils"
 import { BaseButton } from "@/components/material/base-button"
 
 export default async function Announcement(

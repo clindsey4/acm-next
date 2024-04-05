@@ -14,10 +14,8 @@ import { isEventInProgress } from "@/lib/utils"
 import { Locale, getDictionary } from "@/localization"
 import { cookies } from "next/headers"
 import Link from "next/link"
-
-export const showQRCodeMinAccessLevel = AccessLevel.OFFICER
-export const createEventMinAccessLevel = AccessLevel.OFFICER
-export const createNewsMinAccessLevel = AccessLevel.OFFICER
+import { FutureEventItem } from "./future-event-item"
+import { showQRCodeMinAccessLevel, createEventMinAccessLevel } from "@/lib/utils"
 
 const entriesPerPage = 10
 
@@ -128,23 +126,6 @@ export default async function EventsPage(
     )
 }
 
-export function FutureEventItem(
-    {
-        event
-    }: {
-        event: Event
-    }
-) {
-    return (
-        <li className="w-full flex sm:flex-row flex-col gap-3 items-center py-3 px-5 rounded-2xl bg-surface-container">
-            <Link href={`./events/${event.id}`} className="text-2xl font-semibold flex-1 hover:text-primary transition-colors">{event.title}</Link>
-            <section className="flex gap-2 flex-row items-center">
-                <Icon icon='calendar_month' />
-                <h4 className="text-xl"><DateFormatter date={event.startDate} mode={DateFormatterMode.NARROW} /></h4>
-            </section>
-        </li>
-    )
-}
 function PastEventItem(
     {
         event

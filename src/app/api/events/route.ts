@@ -1,4 +1,4 @@
-import { createEventMinAccessLevel } from "@/app/[lang]/events/page";
+import { createEventMinAccessLevel } from "@/lib/utils";
 import { deleteEvent, getEvent } from "@/data/webData";
 import { getActiveSession } from "@/lib/oauth";
 import { cookies } from "next/headers";

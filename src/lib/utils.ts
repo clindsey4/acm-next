@@ -1,5 +1,10 @@
-import { Event, Semester } from "@/data/types"
+import { AccessLevel, Event, Semester } from "@/data/types"
 import { MutableRefObject } from "react"
+
+export const showQRCodeMinAccessLevel = AccessLevel.OFFICER;
+export const createEventMinAccessLevel = AccessLevel.OFFICER;
+export const createNewsMinAccessLevel = AccessLevel.OFFICER;
+export const viewAnyAccountMinAccessLevel = AccessLevel.OFFICER;
 
 export function dateToDateInputValue(
     date: Date
