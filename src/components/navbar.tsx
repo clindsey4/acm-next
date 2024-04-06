@@ -1,6 +1,6 @@
 'use client'
 import { User } from "@/data/types"
-import { MouseEventHandler, useState } from "react"
+import { MouseEventHandler, useEffect, useState } from "react"
 import { useLocale } from "./providers/language-dict-provider"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
@@ -9,11 +9,12 @@ import { IconButton } from "./material/icon-button"
 import { ModalDrawer } from "./transitions/modal-drawer"
 import { FilledButton } from "./material/filled-button"
 import Image from "next/image"
+import { getCookie } from "cookies-next"
 
 export default function Navbar(
     {
         lang,
-        user
+        user: defaultUser
     }: {
         lang: string,
         user: User | null
@@ -21,6 +22,7 @@ export default function Navbar(
 ) {
 
     const [drawerOpen, setDrawerOpen] = useState(false)
+    const [user, setUser] = useState(defaultUser)
     const langDict = useLocale()
     const pathName = usePathname()
 
@@ -48,6 +50,14 @@ export default function Navbar(
             text: langDict.nav_about
         },
     ]
+
+    // set user to null if when the path changes, the session cookie is null
+    useEffect(() => {
+        const session = getCookie('session')?.toString()
+        if (!session) {
+            setUser(null)
+        }
+    }, [pathName])
 
     return (
         <header className="z-50 w-full h-15 px-7 py-2 box-border sticky top-0 backdrop-blur backdrop-saturate-200 before:w-full before:h-full before:absolute bg-[linear-gradient(var(--md-sys-color-background),transparent)] before:bg-background before:opacity-80 before:z-40 before:top-0 before:left-0">

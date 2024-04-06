@@ -1,10 +1,7 @@
 import { cookies } from "next/headers";
-import { RedirectType, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
-import { OAuth2Client } from "google-auth-library";
-import { deleteSession, getUser, insertUser, updateUser } from "@/data/webData";
-import { AccessLevel } from "@/data/types";
-import { generateSession, getActiveSession, logout } from "@/lib/oauth";
+import { getActiveSession, logout } from "@/lib/oauth";
 
 export async function GET(
     request: NextRequest
@@ -23,5 +20,5 @@ export async function GET(
         cookie
     )
 
-    return redirect(referTo, RedirectType.replace)
+    return redirect(referTo)
 }
