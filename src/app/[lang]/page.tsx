@@ -17,7 +17,7 @@ export default async function Home(
 
   return (
     <article className="w-full flex flex-col gap-5 items-center justify-center pt-9">
-      <section className="w-full flex flex-col justify-start items-center gap-8 mt-28">
+      <section className="w-full flex flex-col justify-start items-center gap-8 md:mt-20">
         <Image
           className="w-full max-w-32"
           src='/acm-logo.png'

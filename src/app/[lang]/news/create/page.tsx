@@ -67,11 +67,11 @@ export default async function CreateAnnouncement(
         <form action={createAnnouncment} className="w-full flex flex-col gap-5">
             <PageHeader text="New Post"
                 actions={
-                    <section className="flex flex-col md:flex-row gap-5">
+                    <section className="flex flex-col md:flex-row gap-5 justify-end w-full md:w-fit">
                         <section className="hidden md:block">
                         <FilledButton text={langDict.cancel_post} icon="close" href="./"/>
                         </section>
-                        <FilledButton text={langDict.create_post} icon="add" />
+                        <FilledButton className="w-full md:w-fit" text={langDict.create_post} icon="add" />
                     </section>
                 }
             />

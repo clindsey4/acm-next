@@ -136,7 +136,7 @@ export async function PortableAccountPage(
             </section>
 
             {/* Attendance history */}
-            <h2 className="text-3xl font-semibold mt-14">{langDict.account_attendance_title}</h2>
+            <h2 className="text-3xl font-semibold mt-14 text-center sm:text-left">{langDict.account_attendance_title}</h2>
             <Divider />
             {currentPage === 0 && 0 >= attendanceResult.totalCount ? <h3 className="text-center w-full text-2xl">{isCurrentUser ? langDict.account_attendance_empty : langDict.account_any_attendance_empty}</h3>
                 : <ul className="flex flex-col gap-5">

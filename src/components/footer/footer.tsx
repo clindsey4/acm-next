@@ -30,11 +30,15 @@ export default async function Footer(
                 </li>
                 <li className="w-full">
                     <ul className="flex flex-col sm:flex-row gap-7 justify-center items-center">
-                        <FooterLink text={langDict.nav_about} href={`${root}/about`} />
-                        <FooterLink text={langDict.nav_events} href={`${root}/events`} />
-                        <FooterLink text={langDict.nav_join} href={`${root}/join`} />
-                        <FooterLink text={langDict.nav_news} href={`${root}/news`} />
-                        <FooterLink text={langDict.account_title} href={`${root}/account`} />
+                        <section className="flex gap-7 justify-center items-center">
+                            <FooterLink text={langDict.nav_about} href={`${root}/about`} />
+                            <FooterLink text={langDict.nav_events} href={`${root}/events`} />
+                            <FooterLink text={langDict.nav_join} href={`${root}/join`} />
+                        </section>
+                        <section className="flex gap-7 justify-center items-center">
+                            <FooterLink text={langDict.account_title} href={`${root}/account`} />
+                            <FooterLink text={langDict.nav_news} href={`${root}/news`} />
+                        </section>
                     </ul>
                 </li>
                 <li className="w-full">
