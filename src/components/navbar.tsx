@@ -74,14 +74,6 @@ export default function Navbar(
                             onClick={closeDrawer}
                         />)
                     }
-                    <NavDrawerLink
-                        key='settings'
-                        icon='settings'
-                        href={`/${lang}/settings`}
-                        text={langDict.settings_title}
-                        active={pathName === `/${lang}/settings`}
-                        onClick={closeDrawer}
-                    />
                 </ul>
             </ModalDrawer>
 
@@ -109,9 +101,6 @@ export default function Navbar(
                         </ul>
                     </div>
                 </ul>
-
-                {/* settings button */}
-                <IconButton icon='settings' className='sm:flex hidden' href={`/${lang}/settings`} />
                 
                 {/* login/account button */}
                 {user ? (
