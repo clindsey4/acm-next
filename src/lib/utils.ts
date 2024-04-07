@@ -5,6 +5,7 @@ export const showQRCodeMinAccessLevel = AccessLevel.OFFICER;
 export const createEventMinAccessLevel = AccessLevel.OFFICER;
 export const createNewsMinAccessLevel = AccessLevel.OFFICER;
 export const viewAnyAccountMinAccessLevel = AccessLevel.OFFICER;
+export const dashboardMinAccessLevel = AccessLevel.OFFICER;
 
 export function dateToDateInputValue(
     date: Date

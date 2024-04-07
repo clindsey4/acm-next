@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from "react"
+import { MinimalIconButton } from "../material/minimal-icon-button"
 
 export function TextInputElement(
     {
@@ -8,27 +9,39 @@ export function TextInputElement(
         placeholder,
         required = false,
         maxLength,
-        value
+        value,
+        onValueChanged
     }: {
         name: string,
         placeholder: string,
         required?: boolean,
         maxLength?: number
         value?: string
+        onValueChanged?: (newValue: string) => void
     }
 ) {
     const [formValue, setValue] = useState(value || '')
 
+    function updateValue(newValue: string) {
+        setValue(newValue)
+        if (onValueChanged)
+            onValueChanged(newValue)
+    }
+
     return (
-        <input
-            type='text'
-            className="text-lg text-primary font-bold placeholder:font-normal placeholder:text-on-surface-variant px-5 py-2 bg-surface-container rounded-full"
-            name={name}
-            value={formValue}
-            placeholder={placeholder}
-            required={required}
-            maxLength={maxLength}
-            onChange={(event) => setValue(event.target.value)}
-        />
+        <div className="bg-surface-container rounded-full flex gap-5 items-center px-5">
+            <input
+                type='text'
+                className="text-lg text-primary font-bold placeholder:font-normal placeholder:text-on-surface-variant py-2 bg-transparent rounded-full outline-none"
+                name={name}
+                value={formValue}
+                placeholder={placeholder}
+                required={required}
+                maxLength={maxLength}
+                onChange={(event) => updateValue(event.target.value)}
+            />
+            {formValue === '' ? undefined : <MinimalIconButton icon='close' onClick={_ => updateValue('')}/>}
+        </div>
+
     )
 }

@@ -16,6 +16,7 @@ import { PageSelector } from "@/components/page-selector"
 import { DeleteEventButton } from "./delete-event-button"
 import { DeleteEventAttendanceButton } from "./delete-event-attendance-button"
 import Link from "next/link"
+import { UserListItem } from "@/components/events/user-list-item"
 
 const entriesPerPage = 20
 
@@ -109,7 +110,7 @@ export default async function EventsPage(
                     : <section>
                         <h3 className="text-2xl font-bold mb-2">{langDict.event_attendance}</h3>
                         <ul className="flex gap-3 flex-col w-full">
-                            {attendanceUsers.map(user => <AttendanceListItem
+                            {attendanceUsers.map(user => <UserListItem
                                 key={user.email}
                                 user={user}
                                 action={<DeleteEventAttendanceButton
@@ -131,35 +132,4 @@ export default async function EventsPage(
         </article>
     )
 
-}
-
-function AttendanceListItem(
-    {
-        user,
-        action,
-        href
-    }: {
-        user: User
-        action: React.ReactNode
-        href: string
-    }
-) {
-    return (
-        <li className="w-full bg-surface-container-low rounded-3xl px-4 py-2 flex gap-5 items-center">
-            <figure className="w-9 h-9">
-                <Image
-                    height={36}
-                    width={36}
-                    src={user.picture}
-                    alt={user.givenName}
-                    className="rounded-full object-cover"
-                />
-            </figure>
-            <section className="flex flex-col">
-                <Link href={href}><h4 className="text-xl font-semibold hover:text-primary transition-colors">{user.givenName} {user.familyName}</h4></Link>
-                <h5 className="text-base text-on-surface-variant">{user.email}</h5>
-            </section>
-            <section className="flex-1 flex justify-end">{action}</section>
-        </li>
-    )
 }

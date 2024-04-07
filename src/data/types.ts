@@ -45,6 +45,25 @@ export interface User {
     accessLevel: AccessLevel
 }
 
+export interface RawFilterUser extends RawUser {
+    total_count: number
+}
+
+export interface UsersFilterParams {
+    search?: string
+    givenName?: string
+    familyName?: string
+    accessLevel?: number
+    offset?: number
+    maxEntries?: number
+    direction?: FilterDirection
+}
+
+export interface UsersFilterResults {
+    totalCount: number,
+    results: User[]
+}
+
 // sessions types
 export interface RawSession {
     token: string,

@@ -1,6 +1,6 @@
 import { randomBytes } from "crypto";
 import getDatabase from ".";
-import { AccessLevel, Databases, RawUser, User, RawSession, Session, RawNews, News, EventType, Id, RawEvent, Event, EventFilterParams, FilterDirection, EventFilterResult, RawFilterEvent, RawEventAttendance, EventAttendance, EventsAttendanceFilterParams, EventsAttendanceFilterResults, RawFilterEventAttendance, EventsAttendancePointsFilterParams, EventsAttendancePointsFilterResults, RawEventsAttendancePointsFilterResult, EventsAttendancePointsFilterResult } from "./types";
+import { AccessLevel, Databases, RawUser, User, RawSession, Session, RawNews, News, EventType, Id, RawEvent, Event, EventFilterParams, FilterDirection, EventFilterResult, RawFilterEvent, RawEventAttendance, EventAttendance, EventsAttendanceFilterParams, EventsAttendanceFilterResults, RawFilterEventAttendance, EventsAttendancePointsFilterParams, EventsAttendancePointsFilterResults, RawEventsAttendancePointsFilterResult, EventsAttendancePointsFilterResult, UsersFilterParams, UsersFilterResults, RawFilterUser } from "./types";
 
 
 // import database
@@ -75,6 +75,65 @@ export function getUser(
     return new Promise((resolve, reject) => {
         try {
             resolve(getUserSync(email))
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+/**
+ * Synchronously filters the database based on various filter parameters to find users.
+ * 
+ * @param filterParams The filter params to filter the users on.
+ * @returns A filter result.
+ */
+function filterUsersSync(
+    filterParams: UsersFilterParams
+): UsersFilterResults {
+
+    const queryParams: { [key: string]: any } = {
+        search: filterParams.search ? `%${filterParams.search}%` : null,
+        familyName: filterParams.familyName ? `%${filterParams.familyName}%` : null,
+        givenName: filterParams.givenName ? `%${filterParams.givenName}%` : null,
+        accessLevel: filterParams.accessLevel === undefined ? null : filterParams.accessLevel,
+        offset: filterParams.offset || 0,
+        maxEntries: filterParams.maxEntries || 50,
+        direction: filterParams.direction == undefined ? FilterDirection.DESCENDING : filterParams.direction
+    }
+
+    const dbResult = db.prepare(`
+    SELECT 
+        email, given_name, family_name, picture, access_level,
+        COUNT(*) OVER() as total_count
+    FROM users
+    WHERE (:search IS NULL OR (lower(users.family_name || users.given_name) LIKE lower(:search)) OR (lower(users.email) LIKE lower(:search)))
+        AND (:familyName IS NULL OR users.family_name LIKE :familyName)
+        AND (:givenName IS NULL OR users.given_name LIKE :givenName)
+        AND (:accessLevel IS NULL OR users.access_level = :accessLevel)
+    ORDER BY
+        CASE WHEN :direction = 0 THEN 1 ELSE family_name END ASC,
+        CASE WHEN :direction = 1 THEN 1 ELSE family_name END DESC
+    LIMIT :maxEntries
+    OFFSET :offset`).all(queryParams) as RawFilterUser[]
+
+    return {
+        totalCount: dbResult[0] ? dbResult[0].total_count : 0,
+        results: dbResult.map(raw => buildUser(raw))
+    }
+}
+
+/**
+ * Flters the database based on various filter parameters to find users.
+ * 
+ * @param filterParams The filter params to filter the users on.
+ * @returns A promise that resolves with a filter result.
+ */
+export function filterUsers(
+    filterParams: UsersFilterParams
+): Promise<UsersFilterResults> {
+    return new Promise<UsersFilterResults>((resolve, reject) => {
+        try {
+            resolve(filterUsersSync(filterParams))
         } catch (error) {
             reject(error)
         }
