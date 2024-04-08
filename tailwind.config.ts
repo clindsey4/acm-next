@@ -11,6 +11,31 @@ const config: Config = {
       'sans': 'var(--font-inter)',
     },
     extend: {
+      typography: (theme: (name: string) => any) => ({
+        material: {
+          css: {
+            '--tw-prose-body': theme('colors.on-surface'),
+            '--tw-prose-headings': theme('colors.on-background'),
+            '--tw-prose-lead': theme('colors.on-surface'),
+            '--tw-prose-links': theme('colors.primary'),
+            '--tw-prose-bold': theme('colors.on-surface'),
+            '--tw-prose-counters': theme('colors.on-surface'),
+            '--tw-prose-bullets': theme('colors.outline'),
+            '--tw-prose-hr': theme('colors.outline-variant'),
+            '--tw-prose-quotes': theme('colors.on-surface'),
+            '--tw-prose-quote-borders': theme('colors.outline-variant'),
+            '--tw-prose-captions': theme('colors.on-surface'),
+            '--tw-prose-code': theme('colors.on-surface'),
+            '--tw-prose-pre-code': theme('colors.outline-variant'),
+            '--tw-prose-pre-bg': theme('colors.on-surface'),
+            '--tw-prose-th-borders': theme('colors.outline-variant'),
+            '--tw-prose-td-borders': theme('colors.outline-variant'),
+          }
+        }
+      }),
+      gridTemplateColumns: {
+        'dashboard': '220px 1fr'
+      },
       colors: {
         'primary': 'var(--md-sys-color-primary)',
         'on-primary': 'var(--md-sys-color-on-primary)',
