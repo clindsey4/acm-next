@@ -39,6 +39,10 @@ export default async function Footer(
                             <FooterLink text={langDict.account_title} href={`${root}/account`} />
                             <FooterLink text={langDict.nav_news} href={`${root}/news`} />
                         </section>
+                        <section className="flex gap-7 justify-center items-center">
+                            <FooterLink text={langDict.privacy_policy} href="./PrivacyPolicy.pdf"/>
+                            <FooterLink text={langDict.data_deletion} href={`${root}/datadeletion`}/>
+                        </section>
                     </ul>
                 </li>
                 <li className="w-full">

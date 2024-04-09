@@ -85,5 +85,7 @@
     "language_french_local": "Français",
     "theme_system": "Système",
     "theme_dark": "Sombre",
-    "theme_light": "Clair"
+    "theme_light": "Clair",
+    "privacy_policy": "Privacy Policy",
+    "data_deletion": "Data Deletion"
 }
