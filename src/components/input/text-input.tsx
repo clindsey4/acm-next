@@ -32,7 +32,7 @@ export function TextInputElement(
         <div className="bg-surface-container rounded-full flex gap-5 items-center px-5">
             <input
                 type='text'
-                className="text-lg text-primary font-bold placeholder:font-normal placeholder:text-on-surface-variant py-2 bg-transparent rounded-full outline-none"
+                className="w-full text-lg text-primary font-bold placeholder:font-normal placeholder:text-on-surface-variant py-2 bg-transparent rounded-full outline-none"
                 name={name}
                 value={formValue}
                 placeholder={placeholder}
