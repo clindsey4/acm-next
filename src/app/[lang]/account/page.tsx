@@ -3,6 +3,7 @@ import { Locale, getDictionary } from "@/localization"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import { PortableAccountPage } from "./portable-account-page"
+import { dashboardMinAccessLevel } from "@/lib/utils"
 
 export default async function AccountPage(
     {
@@ -25,7 +26,8 @@ export default async function AccountPage(
     if (session === null) return redirect("/api/oauth?refer=/account")
 
     // get the lang dict
-    const langDict = await getDictionary(params.lang)
+    const lang = params.lang
+    const langDict = await getDictionary(lang)
 
     // get the user from the session
     const user = session.user
@@ -33,9 +35,11 @@ export default async function AccountPage(
     return (
         <PortableAccountPage
             user={user}
+            lang={lang}
             langDict={langDict}
             page={searchParams.page}
             isCurrentUser
+            showDashboardNavigation={session.user.accessLevel >= dashboardMinAccessLevel}
         />
     )
 }
