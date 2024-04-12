@@ -10,7 +10,8 @@ export function TextInputElement(
         required = false,
         maxLength,
         value,
-        onValueChanged
+        onValueChanged,
+        className = ''
     }: {
         name: string,
         placeholder: string,
@@ -18,6 +19,7 @@ export function TextInputElement(
         maxLength?: number
         value?: string
         onValueChanged?: (newValue: string) => void
+        className?: string
     }
 ) {
     const [formValue, setValue] = useState(value || '')
@@ -29,10 +31,10 @@ export function TextInputElement(
     }
 
     return (
-        <div className="bg-surface-container rounded-full flex gap-5 items-center px-5">
+        <div className="bg-surface-container rounded-full flex gap-5 items-center px-5 md:w-auto w-full">
             <input
                 type='text'
-                className="w-full text-lg text-primary font-bold placeholder:font-normal placeholder:text-on-surface-variant py-2 bg-transparent rounded-full outline-none"
+                className={`w-full text-lg text-primary font-bold placeholder:font-normal placeholder:text-on-surface-variant py-2 bg-transparent rounded-full outline-none ${className}`}
                 name={name}
                 value={formValue}
                 placeholder={placeholder}

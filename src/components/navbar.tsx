@@ -104,7 +104,7 @@ export default function Navbar(
                 
                 {/* login/account button */}
                 {user ? (
-                <Link href={`/${lang}/account`} className="h-8 w-8 rounded-full">
+                <Link href={`/${lang}/account`} className="h-8 w-8 my-1 rounded-full">
                     <Image
                         height={32}
                         width={32}

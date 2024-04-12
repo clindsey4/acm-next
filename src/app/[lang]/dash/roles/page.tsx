@@ -88,13 +88,13 @@ export default async function RolesPage(
                     key={user.email}
                     user={user}
                     href={`/${lang}/account/${user.email.split('@')[0]}`}
-                    action={false ? <h4 className="text-xl font-semibold text-right">{langDict[MapAccessLevelToDictKey[user.accessLevel]]}</h4>
+                    action={(user.email === session.user.email || user.accessLevel > sessionAccessLevel) ? <h4 className="text-xl text-right mr-3">{langDict[MapAccessLevelToDictKey[user.accessLevel]]}</h4>
                         : <RoleChanger
                             email={user.email}
                             options={roleOptions}
                             defaultValue={user.accessLevel}
                         />
-                    } // (user.email === session.user.email || user.accessLevel > sessionAccessLevel)
+                    }
                 />) : <li><h3 className="text-3xl font-semibold text-center w-full">{langDict.dash_roles_empty}</h3></li>}
             </ul>
             <PageSelector
