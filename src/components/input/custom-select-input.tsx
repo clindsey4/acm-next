@@ -4,17 +4,19 @@ import { useEffect, useRef, useState } from "react"
 import { Icon } from "../material/icon"
 import { FadeInOut } from "../transitions/fade-in-out"
 
-export function FooterSelect(
+export function CustomSelectInput(
     {
         value,
         options,
         icon,
+        modalClassName = 'bottom-3',
         optionSubtitles,
         onValueChanged = () => { }
     }: {
         value: number,
         options: string[],
         icon: string
+        modalClassName?: string
         optionSubtitles?: string[]
         onValueChanged?: (newValue: number) => void
     }
@@ -22,6 +24,7 @@ export function FooterSelect(
     const [modalOpen, setModalOpen] = useState(false)
 
     // refs
+    const buttonRef = useRef<HTMLButtonElement>(null)
     const modalRef = useRef<HTMLUListElement>(null)
 
     // functions
@@ -33,23 +36,23 @@ export function FooterSelect(
     /* clicking outside of the modal closes the modal */
     useEffect(() => {
         function handleClick(event: MouseEvent) {
-            if (!event.defaultPrevented && !modalRef.current?.contains(event.target as Node)) {
+            if (!buttonRef.current?.contains(event.target as Node) && !modalRef.current?.contains(event.target as Node)) {
                 setModalOpen(false);
             }
         }
         document.addEventListener('click', handleClick);
         return () => document.removeEventListener('click', handleClick);
-    }, []);
+    }, [modalOpen]);
 
     return (
         <ul className="flex flex-col items-center">
             <FadeInOut visible={modalOpen} className="z-10">
                 <li className="relative w-0 h-0">
-                    <ul className="absolute w-48 -left-24 shadow-md bottom-3 flex flex-col gap-2 rounded-2xl bg-surface-container-high p-2 max-h-52 overflow-x-hidden overflow-y-scroll">
+                    <ul className={`absolute w-48 -left-24 shadow-md flex flex-col gap-2 rounded-2xl bg-surface-container-high p-2 max-h-52 overflow-x-hidden overflow-y-scroll ${modalClassName}`}>
                         {options.map((option, index) => {
                             return (
                                 <li key={index}>
-                                    <button 
+                                    <button
                                         className="w-full text-lg text-center transition-colors hover:bg-surface-container-highest rounded-2xl py-1"
                                         onClick={(event) => {
                                             event.preventDefault()
@@ -67,9 +70,9 @@ export function FooterSelect(
             </FadeInOut>
             <li>
                 <button
+                    ref={buttonRef}
                     className="text-lg text-on-surface px-4 py-2 border-outline-variant border bg-transparent rounded-2xl flex gap-3 justify-center items-center"
-                    onClick={(event) => {
-                        event.preventDefault()
+                    onClick={(_) => {
                         setModalOpen(!modalOpen)
                     }}
                 >
