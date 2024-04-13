@@ -1,6 +1,6 @@
 import { randomBytes } from "crypto";
 import getDatabase from ".";
-import { AccessLevel, Databases, RawUser, User, RawSession, Session, RawNews, News, EventType, Id, RawEvent, Event, EventFilterParams, FilterDirection, EventFilterResult, RawFilterEvent, RawEventAttendance, EventAttendance, EventsAttendanceFilterParams, EventsAttendanceFilterResults, RawFilterEventAttendance, EventsAttendancePointsFilterParams, EventsAttendancePointsFilterResults, RawEventsAttendancePointsFilterResult, EventsAttendancePointsFilterResult, UsersFilterParams, UsersFilterResults, RawFilterUser } from "./types";
+import { AccessLevel, Databases, RawUser, User, RawSession, Session, RawNews, News, EventType, Id, RawEvent, Event, EventFilterParams, FilterDirection, EventFilterResult, RawFilterEvent, RawEventAttendance, EventAttendance, EventsAttendanceFilterParams, EventsAttendanceFilterResults, RawFilterEventAttendance, EventsAttendancePointsFilterParams, EventsAttendancePointsFilterResults, RawEventsAttendancePointsFilterResult, EventsAttendancePointsFilterResult, UsersFilterParams, UsersFilterResults, RawFilterUser, RawEventType } from "./types";
 
 
 // import database
@@ -744,6 +744,23 @@ export function deleteNews(
 // ----- EVENT TYPES --------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
+ * Converts a RawEventType object into an EventType object.
+ * 
+ * @param raw The RawEventType object to convert.
+ * @returns The converted EventType object.
+ */
+function buildEventType(
+    raw: RawEventType
+): EventType {
+    return {
+        id: raw.id,
+        name: raw.name,
+        points: raw.points,
+        memberPoints: raw.member_points
+    }
+}
+
+/**
  * Synchronously gets the event type associated with the provided id.
  * 
  * @param id The ID of the event type to get.
@@ -752,11 +769,13 @@ export function deleteNews(
 function getEventTypeSync(
     id: Id
 ): EventType | null {
-    return db.prepare(`
-    SELECT id, name, points
+    const raw = db.prepare(`
+    SELECT id, name, points, member_points
     FROM event_types
     WHERE id = ?
-    `).get(id) as EventType | null
+    `).get(id) as RawEventType | null
+
+    return raw === null ? null : buildEventType(raw)
 }
 
 /**
@@ -783,10 +802,10 @@ export function getEventType(
  * @returns An array of EventType objects.
  */
 function getAllEventTypesSync(): EventType[] {
-    return db.prepare(`
-    SELECT id, name, points
+    return (db.prepare(`
+    SELECT id, name, points, member_points
     FROM event_types
-    `).all() as EventType[]
+    `).all() as RawEventType[]).map(raw => buildEventType(raw))
 }
 
 /**
@@ -815,11 +834,12 @@ function insertEventTypeSync(
 ): EventType {
 
     const eventTypeId = db.prepare(`
-    INSERT INTO event_types (name, points)
-    VALUES (?, ?)
+    INSERT INTO event_types (name, points, member_points)
+    VALUES (?, ?, ?)
     `).run(
         eventType.name,
-        eventType.points
+        eventType.points,
+        eventType.memberPoints
     ).lastInsertRowid
 
     const returnEventType = eventType as EventType
@@ -866,9 +886,15 @@ function updateEventTypeSync(
     }
 
     // points
-    if (eventType.points) {
+    if (eventType.points !== undefined) {
         sets.push('points = ?')
         values.push(eventType.points)
+    }
+
+    // member points
+    if (eventType.memberPoints !== undefined) {
+        sets.push('member_points = ?')
+        values.push(eventType.memberPoints)
     }
 
     // build the SQL query to update the desired values
@@ -945,6 +971,7 @@ function buildEvent(
     return {
         id: rawEvent.id,
         title: rawEvent.title,
+        body: rawEvent.body,
         location: rawEvent.location,
         startDate: new Date(rawEvent.start_date),
         endDate: new Date(rawEvent.end_date),
@@ -974,7 +1001,8 @@ function filterEventsSync(
 
     const rawEvents = db.prepare(`
     SELECT id, 
-        title, 
+        title,
+        body,
         location, 
         start_date, 
         end_date, 
@@ -1025,7 +1053,7 @@ function getEventSync(
     id: Id
 ): Event | null {
     const rawEvent = db.prepare(`
-    SELECT id, title, location, start_date, end_date, type, access_level
+    SELECT id, title, body, location, start_date, end_date, type, access_level
     FROM events
     WHERE id = ?`).get(id) as RawEvent | null
 
@@ -1060,10 +1088,11 @@ function insertEventSync(
     newEvent: Omit<Event, 'id'>
 ): Event {
     const eventId = db.prepare(`
-    INSERT INTO events (title, location, start_date, end_date, type, access_level)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO events (title, body, location, start_date, end_date, type, access_level)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
     `).run(
         newEvent.title,
+        newEvent.body,
         newEvent.location,
         newEvent.startDate.toISOString(),
         newEvent.endDate.toISOString(),
@@ -1106,6 +1135,7 @@ function updateEventSync(
     // maps the fields of the Event object to their database counterparts
     const fields: Record<string, string> = {
         title: 'title',
+        body: 'body',
         location: 'location',
         startDate: 'start_date',
         endDate: 'end_date',
@@ -1291,10 +1321,14 @@ function filterEventsAttendancePointsSync(
     const userEmailsStatement = userEmailsValues ? ` AND (user_email IN (${userEmailsValues}))` : ''
 
     const dbResult = db.prepare(`
-    SELECT user_email, SUM(event_types.points) AS points, COUNT(*) OVER() as total_count
+    SELECT 
+        user_email, 
+        SUM(CASE WHEN users.access_level = 1 THEN event_types.member_points ELSE event_types.points END) AS points,
+        COUNT(*) OVER() as total_count
     FROM events_attendance
     INNER JOIN events ON events.id = event_id
     INNER JOIN event_types ON event_types.id = events.type
+    INNER JOIN users ON users.email = user_email
     WHERE (:fromDate IS NULL OR events.end_date > :fromDate)
         AND (:toDate IS NULL OR :toDate >= events.end_date)
         AND (:type IS NULL OR :type = event_types.id)${eventIdsStatement}${userEmailsStatement}

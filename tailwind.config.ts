@@ -26,8 +26,8 @@ const config: Config = {
             '--tw-prose-quote-borders': theme('colors.outline-variant'),
             '--tw-prose-captions': theme('colors.on-surface'),
             '--tw-prose-code': theme('colors.on-surface'),
-            '--tw-prose-pre-code': theme('colors.outline-variant'),
-            '--tw-prose-pre-bg': theme('colors.on-surface'),
+            '--tw-prose-pre-code': 'var(--md-sys-color-outline-variant-light)',
+            '--tw-prose-pre-bg': 'var(--md-sys-color-on-surface-light)',
             '--tw-prose-th-borders': theme('colors.outline-variant'),
             '--tw-prose-td-borders': theme('colors.outline-variant'),
           }

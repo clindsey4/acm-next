@@ -49,6 +49,7 @@ export default async function CreateEventPage(
                 values={{
                     id: String(event.id),
                     title: event.title,
+                    body: event.body,
                     location: event.location,
                     startDate: event.startDate.toISOString(),
                     endDate: event.endDate.toISOString(),

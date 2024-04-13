@@ -14,10 +14,10 @@ export async function GET(
     // get event
     const eventId = Number(params.get("id"))
     const event = !isNaN(eventId) ? await getEvent(eventId) : null
-    if (event === null) return redirect("/events")
+    if (event === null) return new Response(JSON.stringify({ message: `Invalid event ID.` }), { status: 400 })
 
     // verify that the event can be attended
-    if (!isEventInProgress(event)) return redirect("/events")
+    if (!isEventInProgress(event)) return new Response(JSON.stringify({ message: `Event cannot be attended` }), { status: 400 })
 
     // verify session
     const session = await getActiveSession(cookies())
@@ -25,7 +25,7 @@ export async function GET(
 
     // verify that the user hasn't already attended the event
     const userEmail = session.user.email
-    if (await hasUserAttendedEvent(eventId, userEmail)) return redirect(`/events/${eventId}`)
+    if (await hasUserAttendedEvent(eventId, userEmail)) return new Response(JSON.stringify({ message: `Event already attended` }), { status: 400 })
 
     // attend the event
     await attendEvent(
@@ -34,7 +34,7 @@ export async function GET(
     )
 
     // redirect to the event's page
-    return redirect(`/events/${eventId}`)
+    return new Response(null, { status: 200 })
 }
 
 export async function DELETE(

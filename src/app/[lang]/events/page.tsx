@@ -18,6 +18,7 @@ import { FutureEventItem } from "./future-event-item"
 import { showQRCodeMinAccessLevel, createEventMinAccessLevel } from "@/lib/utils"
 import { PageHeader } from "@/components/page-header"
 import { FloatingActionButton } from "@/components/material/floating-action-button"
+import { AttendEventButton } from "./attend-event-button"
 
 const entriesPerPage = 10
 
@@ -99,9 +100,9 @@ export default async function EventsPage(
                             hasAttendedUpcomingEvent ? <div className="w-full sm:w-fit flex gap-1 border-2 border-on-primary text-on-primary h-10 px-6 items-center justify-center rounded-full">
                                     <Icon icon="check"/>
                                     {langDict.event_attended}
-                                </div> : <BaseButton
+                                </div> : <AttendEventButton
+                                eventId={Number(upcomingEvent.id)}
                                 text={langDict.events_attend}
-                                href={`/api/events/attend?id=${upcomingEvent.id}`}
                                 className="w-full sm:w-fit bg-on-primary text-primary before:bg-on-primary"
                             />
                         : undefined
