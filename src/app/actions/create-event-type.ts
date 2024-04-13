@@ -51,8 +51,8 @@ export async function createEventType(prevState: EventTypeActionState, formData:
     try {
         await insertEventType({
             name: formFields.name.slice(0, 128).toString(),
-            points: points,
-            memberPoints: memberPoints
+            points: Math.max(0, Math.min(100, points)),
+            memberPoints: Math.max(0, Math.min(100, memberPoints))
         })
         redirectTo = `./`
     } catch( error: any ) {

@@ -36,8 +36,8 @@ export async function editEventType(prevState: EventTypeActionState, formData: F
         await updateEventType({
             id: eventTypeId,
             name: formFields.name ? formFields.name.slice(0, 128).toString() : undefined,
-            points: formFields.points ? Number.parseInt(formFields.points.toString()) || 0 : undefined,
-            memberPoints: formFields.memberPoints ? Number.parseInt(formFields.memberPoints.toString()) || 0 : undefined
+            points: formFields.points ? Math.max(0, Math.min(100, Number.parseInt(formFields.points.toString()) || 0)) : undefined,
+            memberPoints: formFields.memberPoints ? Math.max(0, Math.min(100, Number.parseInt(formFields.memberPoints.toString()) || 0)) || 0 : undefined
         })
         redirectTo = `../`
     } catch( error: any ) {
