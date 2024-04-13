@@ -11,7 +11,7 @@ export function AttendanceFilters(
         defaultSemester,
         defaultYear,
         maxYear = new Date().getFullYear(),
-        minYear = 2020
+        minYear = 2024
     }: {
         defaultSemester: Semester,
         defaultYear: number,

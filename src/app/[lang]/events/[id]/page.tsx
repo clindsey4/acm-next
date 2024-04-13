@@ -87,7 +87,7 @@ export default async function EventsPage(
     const buttons = (
         <>
             {eventInProgress && !showQRCode ?
-                hasAttendedEvent ? <div className="w-full sm:w-fit flex gap-1 border-2 border-primary text-primary h-10 px-6 items-center justify-center rounded-full">
+                hasAttendedEvent ? <div className="w-full sm:w-fit font-bold flex gap-1 border-2 border-primary text-primary h-10 px-6 items-center justify-center rounded-full">
                     <Icon icon="check" />
                     {langDict.event_attended}
                 </div> : <AttendEventButton
@@ -125,6 +125,7 @@ export default async function EventsPage(
                 )}
             </section>
             <Divider />
+            
             <article className="flex flex-col md:grid md:grid-cols-dashboard gap-8 w-full">
                 <aside className="w-full px-5 py-3 rounded-3xl bg-surface-container h-fit">
                     <ul className="flex md:flex-col flex-row gap-5 overflow-x-auto overflow-y-clip md:overflow-x-clip">
@@ -164,7 +165,7 @@ export default async function EventsPage(
                 <Divider />
                 {currentPage === 0 && 0 >= attendanceResult.totalCount ? <h3 className="text-center w-full text-3xl font-bold">{langDict.event_no_attendance}</h3>
                     : <section>
-                        <h3 className="text-2xl font-bold mb-2">{langDict.event_attendance}</h3>
+                        <h3 className="text-3xl font-bold mb-3">{langDict.event_attendance}</h3>
                         <ul className="flex gap-3 flex-col w-full">
                             {attendanceUsers.map(user => <UserListItem
                                 key={user.email}

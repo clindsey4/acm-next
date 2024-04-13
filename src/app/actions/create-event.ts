@@ -1,6 +1,5 @@
 'use server'
-
-import { AccessLevel, EventType } from "@/data/types"
+import { AccessLevel } from "@/data/types"
 import { getActiveSession } from "@/lib/oauth"
 import { cookies } from "next/headers"
 import { createEventMinAccessLevel } from "@/lib/utils"

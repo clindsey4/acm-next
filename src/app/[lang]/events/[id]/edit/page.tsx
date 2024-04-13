@@ -5,8 +5,7 @@ import { redirect } from "next/navigation";
 import { SelectInputOption } from "@/components/input/select-input";
 import { getAllEventTypes, getEvent } from "@/data/webData";
 import { createEventMinAccessLevel } from "@/lib/utils";
-import { EventForm } from "../../form";
-import { Locale, getDictionary } from "@/localization";
+import { Locale } from "@/localization";
 import { EditEventForm } from "./edit-event-form";
 
 export default async function CreateEventPage(

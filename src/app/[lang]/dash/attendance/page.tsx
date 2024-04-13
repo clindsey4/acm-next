@@ -2,11 +2,14 @@ import { Divider } from "@/components/material/divider";
 import { PageHeader } from "@/components/page-header";
 import { Locale, getDictionary } from "@/localization";
 import { AttendanceFilters } from "./attendance-filters";
-import { Semester } from "@/data/types";
-import { getMaximumSemesterDate, getMinimumSemesterDate, getSemester } from "@/lib/utils";
+import { AccessLevel, Semester } from "@/data/types";
+import { dashboardMinAccessLevel, getMaximumSemesterDate, getMinimumSemesterDate, getSemester } from "@/lib/utils";
 import { filterEventsAttendance, filterEventsAttendancePoints } from "@/data/webData";
 import { UserListItem } from "@/components/events/user-list-item";
 import { PageSelector } from "@/components/page-selector";
+import { getActiveSession } from "@/lib/oauth";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 const entriesPerPage = 50;
 
@@ -25,6 +28,13 @@ export default async function AttendancePage(
         }
     }
 ) {
+    // get the current session
+    const session = await getActiveSession(cookies())
+    const sessionAccessLevel = session ? session.user.accessLevel : AccessLevel.NON_MEMBER
+
+    // redirect if the user is not able to view any account
+    if (!session || dashboardMinAccessLevel > sessionAccessLevel) return redirect(`/`)
+
     // get language dictionary
     const lang = params.lang
     const langDict = await getDictionary(lang)
@@ -64,7 +74,7 @@ export default async function AttendancePage(
                 actions={<AttendanceFilters defaultSemester={semester} defaultYear={year} />}
             />
             <Divider className="mt-5"/>
-            <ul className="flex flex-col gap-8 mt-8 mb-5 min-h-screen">
+            <ul className="flex flex-col gap-5 mt-5 mb-5 min-h-screen">
                 {attendanceResult.totalCount > 0 ? attendanceResult.results.map(result => <UserListItem
                     key={result.user.email}
                     user={result.user}

@@ -22,7 +22,7 @@ export function UserListItem(
                         width={36}
                         src={user.picture}
                         alt={user.givenName}
-                        className="rounded-full object-cover text-center bg-surface-container-high"
+                        className="rounded-full object-cover text-center bg-surface-container-high overflow-clip border border-outline-variant"
                     />
                 </figure>
                 <section className="flex flex-col">

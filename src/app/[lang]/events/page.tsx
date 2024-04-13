@@ -97,7 +97,7 @@ export default async function EventsPage(
                     inProgress={upcomingEventInProgress}
                     buttons={
                         upcomingEventInProgress && !showQR ?
-                            hasAttendedUpcomingEvent ? <div className="w-full sm:w-fit flex gap-1 border-2 border-on-primary text-on-primary h-10 px-6 items-center justify-center rounded-full">
+                            hasAttendedUpcomingEvent ? <div className="w-full sm:w-fit font-bold flex gap-1 border-2 border-on-primary text-on-primary h-10 px-6 items-center justify-center rounded-full">
                                     <Icon icon="check"/>
                                     {langDict.event_attended}
                                 </div> : <AttendEventButton

@@ -83,7 +83,7 @@ export default async function RolesPage(
                 />}
             />
             <Divider className="mt-5"/>
-            <ul className="flex flex-col gap-8 mt-8 mb-5 min-h-screen">
+            <ul className="flex flex-col gap-5 mt-5 mb-5 min-h-screen">
                 {users.totalCount > 0 ? users.results.map(user => <UserListItem
                     key={user.email}
                     user={user}
