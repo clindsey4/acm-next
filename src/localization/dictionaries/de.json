@@ -53,6 +53,7 @@
     "event_add_to_calendar": "Zum Kalender hinzufügen",
     "event_attendance": "Anwesenheit",
     "event_no_attendance": "Niemand hat diese Veranstaltung bisher besucht.",
+    "event_attended": "",
     "edit_event_title": "':event_title' bearbeiten",
     "edit_event_save": "Speichern",
     "account_title": "Konto",

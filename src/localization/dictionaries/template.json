@@ -53,6 +53,7 @@
     "event_add_to_calendar": "",
     "event_attendance": "",
     "event_no_attendance": "",
+    "event_attended": "",
     "edit_event_title": "",
     "edit_event_save": "",
     "account_title": "",

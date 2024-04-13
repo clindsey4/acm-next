@@ -75,7 +75,7 @@ export default async function EventsPage(
 
     return (
         <article className="w-full flex flex-col gap-5">
-            <EventCard
+            {/* <EventCard
                 event={event}
                 showQR={showQRCode}
                 inProgress={eventInProgress}
@@ -102,7 +102,7 @@ export default async function EventsPage(
                     </>
                 }
                 className="p-6 bg-surface-container rounded-3xl"
-            />
+            /> */}
             {/* Only show attendance to officers and higher */}
             {canCreateEvents ? <>
                 <Divider />

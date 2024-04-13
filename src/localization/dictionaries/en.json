@@ -53,6 +53,7 @@
     "event_add_to_calendar": "Add to Calendar",
     "event_attendance": "Attendance",
     "event_no_attendance": "No one has attended this event yet.",
+    "event_attended": "Attended",
     "edit_event_title": "Edit ':event_title'",
     "edit_event_save": "Save",
     "account_title": "Account",
