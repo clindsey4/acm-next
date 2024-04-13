@@ -1305,6 +1305,7 @@ function filterEventsAttendancePointsSync(
     OFFSET :offset`).all(queryParams) as RawEventsAttendancePointsFilterResult[]
 
     const results: EventsAttendancePointsFilterResult[] = []
+    let total_correct = 0
     for (const raw of dbResult) {
         const user = getUserSync(raw.user_email)
         if (user) {
@@ -1312,11 +1313,13 @@ function filterEventsAttendancePointsSync(
                 user: user,
                 points: raw.points
             })
+        } else {
+            total_correct += 1
         }
     }
 
     return {
-        totalCount: dbResult[0] ? dbResult[0].total_count : 0,
+        totalCount: dbResult[0] ? dbResult[0].total_count - total_correct : 0,
         results: results
     }
 }
