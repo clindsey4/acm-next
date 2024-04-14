@@ -13,6 +13,15 @@ if (!existsSync(dataDirectory)) {
     }
 }
 
+const imagesDirectory = rootDirectory + (process.env.DATABASE_LOCATION || '/src/data/database/') + 'images/'
+if (!existsSync(imagesDirectory)) {
+    try {
+        mkdirSync(imagesDirectory)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 const loadedDatabases: {
     [key in Databases]?: Database
 } = {}

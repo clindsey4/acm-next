@@ -30,8 +30,7 @@ export default function init(
         title TEXT NOT NULL,
         subject TEXT,
         body TEXT NOT NULL,
-        post_date TEXT NOT NULL,
-        image_url TEXT
+        post_date TEXT NOT NULL
     )`).run()
 
     // event types

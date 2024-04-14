@@ -102,8 +102,7 @@ describe('Database', () => {
             "Test Title",
             null,
             "Test Body",
-            testDate,
-            null
+            testDate
         )
             .then(newsId => {
                 newsRecordId = newsId
@@ -118,8 +117,7 @@ describe('Database', () => {
                 title: "Test Title",
                 subject: null,
                 body: "Test Body",
-                postDate: testDate,
-                imageURL: null
+                postDate: testDate
             } as News))
     })
 
@@ -129,8 +127,7 @@ describe('Database', () => {
             title: "Test Title",
             subject: "Test Subject",
             body: "Test Body",
-            postDate: testDate,
-            imageURL: null
+            postDate: testDate
         } as News)
             .then(result => expect(result).toBe(true))
     })
@@ -142,8 +139,7 @@ describe('Database', () => {
                 title: "Test Title",
                 subject: "Test Subject",
                 body: "Test Body",
-                postDate: testDate,
-                imageURL: null
+                postDate: testDate
             }))
     })
 
