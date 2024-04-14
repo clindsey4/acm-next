@@ -86,8 +86,7 @@ export interface RawNews {
     title: string,
     subject: string | null,
     body: string,
-    post_date: string,
-    image_url: string | null
+    post_date: string
 }
 
 export interface News {
@@ -95,8 +94,7 @@ export interface News {
     title: string,
     subject: string | null,
     body: string,
-    postDate: Date,
-    imageURL: string | null
+    postDate: Date
 }
 
 // event types types

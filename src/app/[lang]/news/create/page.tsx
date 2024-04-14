@@ -13,6 +13,10 @@ import { Locale, getDictionary } from "@/localization";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { writeFile } from 'fs'
+
+const rootDirectory = process.cwd()
+const imagesDirectory = rootDirectory + (process.env.DATABASE_LOCATION || '/src/data/database/') + 'images/'
+
 export default async function CreateAnnouncement(
     {
         params
@@ -41,24 +45,27 @@ export default async function CreateAnnouncement(
         if (title == null || body == null || postDate == "" || postDate == null)
             return
 
-        //Store file on server
-        if (imageInput.size != 0 ) {
-            const content = await imageInput.arrayBuffer()
-                .then(response => new Int8Array(response))
-            writeFile(`./public/media_images/${imageInput.name}`, content, (err) => {
-                if (err != null)
-                    console.log(err)
-                redirect("/news")
-            })
+        //Limit file size
+        if (imageInput.size >= 20000000) {
+            return redirect("/news")
         }
-        
-        await insertNews(
+
+        const newsId = await insertNews(
             title.toString(),
             subject == null ? null : subject.toString(),
             body.toString(),
-            new Date(postDate.toString()),
-            (imageInput.size != 0) ? imageInput.name : ""
+            new Date(postDate.toString())
         )
+
+        //Store file on server
+        if (imageInput.size != 0) {
+            const content = await imageInput.arrayBuffer()
+                .then(response => new Int8Array(response))
+            writeFile(imagesDirectory + newsId + '.jpg', content, (err) => {
+                if (err != null)
+                    console.log(err)
+            })
+        }
 
         redirect("/news")
     }
@@ -69,7 +76,7 @@ export default async function CreateAnnouncement(
                 actions={
                     <section className="flex flex-col md:flex-row gap-5 justify-end w-full md:w-fit">
                         <section className="hidden md:block">
-                        <FilledButton text={langDict.cancel_post} icon="close" href="./"/>
+                            <FilledButton text={langDict.cancel_post} icon="close" href="./" />
                         </section>
                         <FilledButton className="w-full md:w-fit" text={langDict.create_post} icon="add" />
                     </section>

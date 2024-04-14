@@ -532,8 +532,7 @@ function buildNews(rawNews: RawNews): News {
         title: rawNews.title,
         subject: rawNews.subject,
         body: rawNews.body,
-        postDate: new Date(rawNews.post_date),
-        imageURL: rawNews.image_url
+        postDate: new Date(rawNews.post_date)
     } as News
 }
 
@@ -547,7 +546,7 @@ function getNewsSync(
     id: number
 ): News | null {
     let rawData = db.prepare(`
-    SELECT id, title, subject, body, post_date, image_url FROM news 
+    SELECT id, title, subject, body, post_date FROM news 
     WHERE id = ?
     `)
         .get(id) as RawNews | null
@@ -587,7 +586,7 @@ function getNewsfeedSync(
     page: number
 ): News[] {
     let rawData = db.prepare(`
-    SELECT id, title, subject, body, post_date, image_url FROM news 
+    SELECT id, title, subject, body, post_date FROM news 
     ORDER BY post_date DESC, Id DESC
     LIMIT ? OFFSET ? 
     `)
@@ -630,14 +629,13 @@ function insertNewsSync(
     title: string,
     subject: string | null,
     body: string,
-    postDate: Date,
-    imageURL: string | null
+    postDate: Date
 ): number {
     let newsId = db.prepare(`
-    INSERT INTO news (title, subject, body, post_date, image_url)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO news (title, subject, body, post_date)
+    VALUES (?, ?, ?, ?)
     `)
-        .run(title, subject, body, postDate.toISOString(), imageURL)
+        .run(title, subject, body, postDate.toISOString())
         .lastInsertRowid
 
     return Number(newsId)
@@ -657,12 +655,11 @@ export function insertNews(
     title: string,
     subject: string | null,
     body: string,
-    postDate: Date,
-    imageURL: string | null
+    postDate: Date
 ): Promise<number> {
     return new Promise<number>((resolve, reject) => {
         try {
-            resolve(insertNewsSync(title, subject, body, postDate, imageURL))
+            resolve(insertNewsSync(title, subject, body, postDate))
         } catch (error) {
             reject(error)
         }
@@ -679,10 +676,10 @@ function updateNewsSync(
     news: News
 ): boolean {
     db.prepare(`
-    UPDATE news SET title = ?, subject = ?, body = ?, post_date = ?, image_url = ?
+    UPDATE news SET title = ?, subject = ?, body = ?, post_date = ?
     WHERE id = ?
     `)
-        .run(news.title, news.subject, news.body, news.postDate.toISOString(), news.imageURL, news.id)
+        .run(news.title, news.subject, news.body, news.postDate.toISOString(), news.id)
 
     return true
 }
