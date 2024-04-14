@@ -19,7 +19,7 @@ export function RoleChanger(
             name='accessLevel'
             options={options}
             value={defaultValue}
-            className="bg-surface-container-high border-surface-container-high"
+            className="bg-surface-container-high border-surface-container-high w-full"
             onValueChanged={async (newValue) => {
                 const result = await updateAccessLevel(email, newValue)
                 console.log(result)

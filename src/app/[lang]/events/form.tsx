@@ -2,6 +2,7 @@
 
 import { EventActionState } from "@/app/actions/create-event"
 import { InputSection } from "@/components/input/input-section"
+import { MarkdownInput } from "@/components/input/markdown-input"
 import { SelectInput, SelectInputOption } from "@/components/input/select-input"
 import { TextInputElement } from "@/components/input/text-input"
 import { UTCDateInput } from "@/components/input/utc-date-input"
@@ -19,6 +20,7 @@ const initialFormState = {
 export interface EventFormValues {
     id?: string,
     title?: string,
+    body?: string,
     location?: string,
     startDate?: string,
     endDate?: string,
@@ -126,8 +128,15 @@ export function EventForm(
                 />
             </InputSection>
 
+            {/* Body Section */}
+            <MarkdownInput
+                title={langDict.new_event_body_field}
+                name='body'
+                value={values.body}
+            />
+
             <section className="flex sm:hidden flex-col gap-5 w-full">
-                <Divider/>
+                <Divider />
                 <FilledButton className="w-full" text={actionText} disabled={pending} />
             </section>
 

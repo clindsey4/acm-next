@@ -30,7 +30,7 @@ export default async function Announcement(
     const news = await getNews(params.newsId)
     if (news == null)
         return (
-            <PageHeader text={langDict.news_id_not_found}/>
+            <PageHeader text={langDict.news_id_not_found} />
         )
 
     return (
@@ -38,19 +38,19 @@ export default async function Announcement(
             <PageHeader text={news.title}></PageHeader>
             <h2 className="text-on-surface-variant">{news.subject}</h2>
             <section className="w-full flex flex-col md:flex-row justify-between items-center gap-5">
-                <DateFormatter date={news.postDate} mode={DateFormatterMode.NARROW}/>
+                <DateFormatter date={news.postDate} mode={DateFormatterMode.NARROW} />
                 {
-                accessLevel >= createNewsMinAccessLevel ?
-                <section className="flex gap-5">
-                <FilledButton text="Edit" icon="edit"></FilledButton>
-                <BaseButton text="Delete" icon="delete" className="bg-error text-on-error before:bg-on-error"></BaseButton>
-                </section>
-                :
-                undefined
+                    accessLevel >= createNewsMinAccessLevel ?
+                        <section className="flex gap-5">
+                            <FilledButton text="Edit" icon="edit"></FilledButton>
+                            <BaseButton text="Delete" icon="delete" className="bg-error text-on-error before:bg-on-error"></BaseButton>
+                        </section>
+                        :
+                        undefined
                 }
             </section>
-            <Divider/>
-            <Markdown className="text-on-surface prose prose-xl max-w-none break-words">
+            <Divider />
+            <Markdown className="text-on-surface prose prose-material prose-xl max-w-none break-words">
                 {news.body}
             </Markdown>
         </article>

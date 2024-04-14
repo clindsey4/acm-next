@@ -27,6 +27,7 @@ export async function editEvent(prevState: EventActionState, formData: FormData)
     // get the formdata
     const formFields = {
         title: formData.get('title'),
+        body: formData.get('body'),
         location: formData.get('location'),
         startDate: formData.get('start-date'),
         endDate: formData.get('end-date'),
@@ -44,6 +45,7 @@ export async function editEvent(prevState: EventActionState, formData: FormData)
         await updateEvent({
             id: eventId,
             title: formFields.title ? formFields.title.slice(0, 128).toString() : undefined,
+            body: formFields.body ? formFields.body.toString() : undefined,
             location: formFields.location ? formFields.location.slice(0, 52).toString() : undefined,
             startDate: formFields.startDate ? new Date(formFields.startDate.toString()) : undefined,
             endDate: formFields.endDate ? new Date(formFields.endDate.toString()) : undefined,

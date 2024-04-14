@@ -2,7 +2,7 @@
 
 import { LanguageDictionaryKey, Locale, langLocaleTokens, locales } from "@/localization"
 import { Theme } from "../../lib/settings-types"
-import { FooterSelect } from "./footer-select"
+import { CustomSelectInput } from "../input/custom-select-input"
 import { useEffect, useState } from "react"
 import { useLocale } from "../providers/language-dict-provider"
 import { useTheme } from "next-themes"
@@ -55,7 +55,7 @@ export function FooterSettings(
     return (
         <>
             {/* Language */}
-            <FooterSelect
+            <CustomSelectInput
                 value={selectedLocale}
                 options={localeOptions}
                 optionSubtitles={localeSubOptions}
@@ -68,7 +68,7 @@ export function FooterSettings(
             />
 
             {/* Theme */}
-            <FooterSelect
+            <CustomSelectInput
                 value={currentSettings.theme}
                 options={[
                     langDict['theme_system'],

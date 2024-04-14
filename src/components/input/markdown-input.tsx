@@ -10,16 +10,18 @@ import { FilledButton } from "../material/filled-button"
 export function MarkdownInput(
     {
         title,
-        name
+        name,
+        value
     }:
         {
             title: string,
-            name: string
+            name: string,
+            value?: string
         }
 ) {
     const langDict = useLocale();
     const [showMarkdown, setShowMarkdown] = useState(false)
-    const [markdownValue, setMarkdownValue] = useState("")
+    const [markdownValue, setMarkdownValue] = useState(value || '')
     return (
         <section className="flex flex-col gap-3 w-full">
             <section className="w-full flex gap-5 justify-between items-end">
@@ -36,7 +38,7 @@ export function MarkdownInput(
             {
                 (showMarkdown) ?
                 <div className="w-full bg-surface-container rounded-2xl px-5 py-2">
-                    <Markdown className="text-on-surface prose prose-xl max-w-none break-words">
+                    <Markdown className="text-on-surface prose prose-lg prose-material max-w-none break-words">
                         {markdownValue ? markdownValue : "No message found"}
                     </Markdown>
                 </div>

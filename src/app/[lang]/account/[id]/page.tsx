@@ -34,14 +34,17 @@ export default async function AnyAccountPage(
     if (user === null) return redirect("./")
 
     // get the lang dict
-    const langDict = await getDictionary(params.lang)
+    const lang = params.lang
+    const langDict = await getDictionary(lang)
 
     return (
         <PortableAccountPage
             user={user}
+            lang={lang}
             langDict={langDict}
             page={searchParams.page}
             isCurrentUser={session.user.email === user.email}
+            showDashboardNavigation={true}
         />
     )
 

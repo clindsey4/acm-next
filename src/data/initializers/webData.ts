@@ -38,20 +38,22 @@ export default function init(
     database.prepare(`CREATE TABLE IF NOT EXISTS event_types (
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         name TEXT NOT NULL,
-        points INTEGER NOT NULL
+        points INTEGER NOT NULL,
+        member_points INTEGER NOT NULL
     )`).run()
 
     // create default types
     if (!exists) {
-        database.prepare(`INSERT INTO event_types (name, points) VALUES (?, ?)`).run('Normal', 1)
-        database.prepare(`INSERT INTO event_types (name, points) VALUES (?, ?)`).run('Educational', 2)
-        database.prepare(`INSERT INTO event_types (name, points) VALUES (?, ?)`).run('Officer', 0)
+        database.prepare(`INSERT INTO event_types (name, points, member_points) VALUES (?, ?, ?)`).run('Normal', 1, 2)
+        database.prepare(`INSERT INTO event_types (name, points, member_points) VALUES (?, ?, ?)`).run('Educational', 2, 3)
+        database.prepare(`INSERT INTO event_types (name, points, member_points) VALUES (?, ?, ?)`).run('Officer', 0, 0)
     }
 
     // events
     database.prepare(`CREATE TABLE IF NOT EXISTS events (
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         title TEXT NOT NULL,
+        body TEXT NOT NULL,
         location TEXT NOT NULL,
         start_date TEXT NOT NULL,
         end_date TEXT NOT NULL,

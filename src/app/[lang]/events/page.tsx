@@ -8,7 +8,7 @@ import { FilledButton } from "@/components/material/filled-button"
 import { Icon } from "@/components/material/icon"
 import { PageSelector } from "@/components/page-selector"
 import { AccessLevel, Event, FilterDirection, Semester } from "@/data/types"
-import { filterEvents } from "@/data/webData"
+import { filterEvents, hasUserAttendedEvent } from "@/data/webData"
 import { getActiveSession } from "@/lib/oauth"
 import { isEventInProgress } from "@/lib/utils"
 import { Locale, getDictionary } from "@/localization"
@@ -18,6 +18,7 @@ import { FutureEventItem } from "./future-event-item"
 import { showQRCodeMinAccessLevel, createEventMinAccessLevel } from "@/lib/utils"
 import { PageHeader } from "@/components/page-header"
 import { FloatingActionButton } from "@/components/material/floating-action-button"
+import { AttendEventButton } from "./attend-event-button"
 
 const entriesPerPage = 10
 
@@ -54,6 +55,7 @@ export default async function EventsPage(
         direction: FilterDirection.ASCENDING,
         maxEntries: 1
     })).results[0] as Event | null
+    const hasAttendedUpcomingEvent = upcomingEvent && session ? await hasUserAttendedEvent(upcomingEvent.id, session.user.email) : false
 
     // check whether the upcoming event is in progress
     const upcomingEventInProgress = upcomingEvent ? isEventInProgress(upcomingEvent) : false
@@ -94,11 +96,16 @@ export default async function EventsPage(
                     showQR={showQR}
                     inProgress={upcomingEventInProgress}
                     buttons={
-                        upcomingEventInProgress && !showQR ? <BaseButton
-                            text={langDict.events_attend}
-                            href={`/api/events/attend?id=${upcomingEvent.id}`}
-                            className="w-full sm:w-fit bg-on-primary text-primary before:bg-on-primary"
-                        /> : undefined
+                        upcomingEventInProgress && !showQR ?
+                            hasAttendedUpcomingEvent ? <div className="w-full sm:w-fit font-bold flex gap-1 border-2 border-on-primary text-on-primary h-10 px-6 items-center justify-center rounded-full">
+                                    <Icon icon="check"/>
+                                    {langDict.event_attended}
+                                </div> : <AttendEventButton
+                                eventId={Number(upcomingEvent.id)}
+                                text={langDict.events_attend}
+                                className="w-full sm:w-fit bg-on-primary text-primary before:bg-on-primary"
+                            />
+                        : undefined
                     }
                     className="p-6 bg-primary text-on-primary rounded-3xl"
                 />

@@ -3,12 +3,13 @@
 import { useState } from "react"
 import { MinimalIconButton } from "../material/minimal-icon-button"
 
-export function TextInputElement(
+export function NumberInputElement(
     {
         name,
         placeholder,
         required = false,
-        maxLength,
+        minValue,
+        maxValue,
         value,
         onValueChanged,
         className = ''
@@ -16,13 +17,14 @@ export function TextInputElement(
         name: string,
         placeholder: string,
         required?: boolean,
-        maxLength?: number
-        value?: string
+        minValue?: number
+        maxValue?: number
+        value?: number
         onValueChanged?: (newValue: string) => void
         className?: string
     }
 ) {
-    const [formValue, setValue] = useState(value || '')
+    const [formValue, setValue] = useState(value !== undefined ? value.toString() : '')
 
     function updateValue(newValue: string) {
         setValue(newValue)
@@ -33,19 +35,20 @@ export function TextInputElement(
     return (
         <div className="bg-surface-container rounded-full flex gap-5 items-center px-5 md:w-auto w-full">
             <input
-                type='text'
+                type='number'
                 className={`w-full text-lg text-primary font-bold placeholder:font-normal placeholder:text-on-surface-variant py-2 bg-transparent rounded-full outline-none ${className}`}
                 name={name}
                 value={formValue}
                 placeholder={placeholder}
                 required={required}
-                maxLength={maxLength}
+                min={minValue}
+                max={maxValue}
                 onChange={(event) => updateValue(event.target.value)}
             />
             {formValue === '' ? undefined : <MinimalIconButton icon='close' onClick={event => {
                 event.preventDefault()
-                updateValue('')
-            }}/>}
+                updateValue('0')
+            }} />}
         </div>
 
     )

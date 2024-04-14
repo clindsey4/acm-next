@@ -1,6 +1,5 @@
 'use server'
-
-import { AccessLevel, EventType } from "@/data/types"
+import { AccessLevel } from "@/data/types"
 import { getActiveSession } from "@/lib/oauth"
 import { cookies } from "next/headers"
 import { createEventMinAccessLevel } from "@/lib/utils"
@@ -23,6 +22,7 @@ export async function createEvent(prevState: EventActionState, formData: FormDat
     // get the formdata
     const formFields = {
         title: formData.get('title'),
+        body: formData.get('body'),
         location: formData.get('location'),
         startDate: formData.get('start-date'),
         endDate: formData.get('end-date'),
@@ -31,7 +31,7 @@ export async function createEvent(prevState: EventActionState, formData: FormDat
     }
 
     // verify that required fields aren't missing
-    if (!formFields.title || !formFields.location || !formFields.startDate || !formFields.endDate || !formFields.type || !formFields.accessLevel) return {
+    if (!formFields.title || !formFields.body || !formFields.location || !formFields.startDate || !formFields.endDate || !formFields.type || !formFields.accessLevel) return {
         error: 'Missing input fields.'
     } as EventActionState
 
@@ -47,6 +47,7 @@ export async function createEvent(prevState: EventActionState, formData: FormDat
     try {
         const newEvent = await insertEvent({
             title: formFields.title.slice(0, 128).toString(),
+            body: formFields.body.toString(),
             location: formFields.location.slice(0, 52).toString(),
             startDate: new Date(formFields.startDate.toString()),
             endDate: new Date(formFields.endDate.toString()),
@@ -55,6 +56,7 @@ export async function createEvent(prevState: EventActionState, formData: FormDat
         })
         redirectTo = `./${newEvent.id}`
     } catch( error: any ) {
+        console.log(error)
         return {
             error: error?.message || 'Error when creating event.'
         } as EventActionState

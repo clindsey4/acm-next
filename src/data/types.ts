@@ -100,16 +100,26 @@ export interface News {
 }
 
 // event types types
+
+export interface RawEventType {
+    id: Id
+    name: string
+    points: number
+    member_points: number
+}
+
 export interface EventType {
     id: Id
     name: string
     points: number
+    memberPoints: number
 }
 
 // event types
 export interface RawEvent {
     id: Id
     title: string
+    body: string
     location: string
     start_date: string
     end_date: string
@@ -124,6 +134,7 @@ export interface RawFilterEvent extends RawEvent {
 export interface Event {
     id: Id
     title: string
+    body: string
     location: string
     startDate: Date
     endDate: Date

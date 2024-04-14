@@ -29,7 +29,7 @@ export function SelectInput(
     return (
         <select
             name={name}
-            className={`text-lg text-on-surface px-5 py-2 bg-surface-container rounded-full border-r-8 border-surface-container ${className}`}
+            className={`text-lg text-on-surface px-5 py-2 bg-surface-container rounded-full border-r-8 border-surface-container hover:cursor-pointer ${className}`}
             required={required}
             value={formValue}
             onChange={event => {
