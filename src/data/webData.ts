@@ -7,7 +7,7 @@ import { AccessLevel, Databases, RawUser, User, RawSession, Session, RawNews, Ne
 const db = getDatabase(Databases.WEB_DATA)
 
 function buildInStatement(
-    values: any[], 
+    values: any[],
     queryParams: { [key: string]: any },
     prefix: string = '',
 ) {
@@ -1363,7 +1363,7 @@ export function filterEventsAttendancePoints(
 ): Promise<EventsAttendancePointsFilterResults> {
     return new Promise<EventsAttendancePointsFilterResults>((resolve, reject) => {
         try {
-            resolve(filterEventsAttendancePointsSync(filterParams))   
+            resolve(filterEventsAttendancePointsSync(filterParams))
         } catch (error) {
             reject(error)
         }
@@ -1474,6 +1474,81 @@ export function deleteEventAttendance(
     return new Promise<void>((resolve, reject) => {
         try {
             resolve(deleteEventAttendanceSync(eventId, userEmail))
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+// ----- docs --------------------------------------------------------------------------------------------------------------------------------------------
+
+/**
+ * Synchronously gets a document from the database.
+ * 
+ * @param key The key of the document.
+ * @returns The value of the document.
+ */
+function getDocumentSync(
+    key: string
+): string | null {
+    const result = db.prepare(`
+    SELECT key, value
+    FROM docs
+    WHERE key = ?
+    `).get(key) as { key: string, value: string } | null
+
+    return result ? result.value : null
+}
+
+/**
+ * Gets a document from the database.
+ * 
+ * @param key The key of the document.
+ * @returns A promise that resolves with the value of the document or null.
+ */
+export function getDocument(
+    key: string
+): Promise<string | null> {
+    return new Promise<string | null>((resolve, reject) => {
+        try {
+            resolve(getDocumentSync(key))
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+/**
+ * Synchronously updates an existing document in the database.
+ * 
+ * @param key The key of the document to update.
+ * @param newValue The new value of the document.
+ */
+function updateDocumentSync(
+    key: string,
+    newValue: string
+) {
+    db.prepare(`
+    UPDATE docs
+    SET value = ?
+    WHERE key = ?
+    `).run(newValue, key)
+}
+
+/**
+ * Updates an existing document in the database.
+ * 
+ * @param key The key of the document to update.
+ * @param newValue The new value of the document.
+ * @returns A promise that resolves when the document has been updated.
+ */
+export function updateDocument(
+    key: string,
+    newValue: string
+): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        try {
+            resolve(updateDocumentSync(key, newValue))
         } catch (error) {
             reject(error)
         }

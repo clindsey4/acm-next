@@ -71,4 +71,15 @@ export default function init(
         FOREIGN KEY (user_email) REFERENCES users (email) ON DELETE CASCADE 
     )`).run()
 
+    // docs
+    database.prepare(`CREATE TABLE IF NOT EXISTS docs (
+        key STRING PRIMARY KEY NOT NULL,
+        value STRING NOT NULL
+    )`).run()
+
+    // insert default document
+    if (!exists) {
+        database.prepare('INSERT INTO docs (key, value) VALUES (?, ?)').run('about', '')
+    }
+
 }

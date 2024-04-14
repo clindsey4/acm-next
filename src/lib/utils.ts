@@ -7,6 +7,7 @@ export const createNewsMinAccessLevel = AccessLevel.OFFICER;
 export const viewAnyAccountMinAccessLevel = AccessLevel.OFFICER;
 export const dashboardMinAccessLevel = AccessLevel.OFFICER;
 export const createEventTypeMinAccessLevel = AccessLevel.OFFICER;
+export const editAboutUsMinAccessLevel = AccessLevel.OFFICER;
 
 export function dateToDateInputValue(
     date: Date
