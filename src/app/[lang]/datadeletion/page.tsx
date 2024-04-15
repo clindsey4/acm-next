@@ -1,6 +1,5 @@
 import { FilledButton } from "@/components/material/filled-button"
-import { PageHeader } from "@/components/page-header"
-import { deleteEventAttendance, deleteSession, deleteSessionByEmail, deleteUser } from "@/data/webData"
+import { deleteUser } from "@/data/webData"
 import { getActiveSession } from "@/lib/oauth"
 import { getDictionary, Locale } from "@/localization"
 import { cookies } from "next/headers"
