@@ -8,8 +8,8 @@ import { Icon } from "./material/icon"
 import { IconButton } from "./material/icon-button"
 import { ModalDrawer } from "./transitions/modal-drawer"
 import { FilledButton } from "./material/filled-button"
-import Image from "next/image"
 import { getCookie } from "cookies-next"
+import Image from "./image"
 
 export default function Navbar(
     {
@@ -110,7 +110,7 @@ export default function Navbar(
                         width={32}
                         src={user.picture}
                         alt={user.givenName}
-                        className="rounded-full object-cover"
+                        className="rounded-full object-cover border border-outline-variant overflow-clip"
                     />
                 </Link>
                 ) : <FilledButton text={langDict.nav_login} href={`/api/oauth?refer=${pathName}`} />}
