@@ -104,10 +104,10 @@ export default function Navbar(
                 
                 {/* login/account button */}
                 {user ? (
-                <Link href={`/${lang}/account`} className="h-10 w-10 my-1 rounded-full">
+                <Link href={`/${lang}/account`} className="h-8 w-8 my-1 rounded-full">
                     <Image
-                        height={40}
-                        width={40}
+                        height={32}
+                        width={32}
                         src={user.picture}
                         alt={user.givenName}
                         className="rounded-full object-cover border border-outline-variant overflow-clip"
