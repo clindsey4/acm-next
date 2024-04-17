@@ -3,7 +3,8 @@
 const dictionaries = {
     en: () => import('./dictionaries/en.json').then(module => module.default),
     de: () => import('./dictionaries/de.json').then(module => module.default),
-    fr: () => import('./dictionaries/fr.json').then(module => module.default)
+    fr: () => import('./dictionaries/fr.json').then(module => module.default),
+    es: () => import('./dictionaries/es.json').then(module => module.default)
 }
 
 export type Locale = keyof typeof dictionaries
@@ -17,7 +18,8 @@ export const locales = Object.keys(dictionaries)
 export const langLocaleTokens: {[key in Locale]: LanguageDictionaryKey} = {
     en: 'language_english',
     de: "language_german",
-    fr: "language_french"
+    fr: "language_french",
+    es: 'language_spanish'
 }
 
 export const getDictionary = async (locale: Locale) => {

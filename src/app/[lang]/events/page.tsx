@@ -35,10 +35,12 @@ export default async function EventsPage(
         }
     }
 ) {
-    const langDict = await getDictionary(params.lang)
+    const locale = params.lang
+    const langDict = await getDictionary(locale)
 
     // get session & access level
     const session = await getActiveSession(cookies())
+    const loggedIn = session !== null
     const accessLevel = session ? session.user.accessLevel : AccessLevel.NON_MEMBER
     const showQR = accessLevel >= showQRCodeMinAccessLevel
 
@@ -100,10 +102,11 @@ export default async function EventsPage(
                             hasAttendedUpcomingEvent ? <div className="w-full sm:w-fit font-bold flex gap-1 border-2 border-on-primary text-on-primary h-10 px-6 items-center justify-center rounded-full">
                                     <Icon icon="check"/>
                                     {langDict.event_attended}
-                                </div> : <AttendEventButton
-                                eventId={Number(upcomingEvent.id)}
+                                </div> : <BaseButton
+                                href={`/api/events/attend?id=${upcomingEvent.id}&lang=${locale}`}
                                 text={langDict.events_attend}
                                 className="w-full sm:w-fit bg-on-primary text-primary before:bg-on-primary"
+                                prefetch={false}
                             />
                         : undefined
                     }

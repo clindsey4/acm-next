@@ -11,13 +11,16 @@ export async function GET(
 ) {
     const params = request.nextUrl.searchParams
 
+    // get lang
+    const lang = params.get("lang") || 'en'
+
     // get event
     const eventId = Number(params.get("id"))
     const event = !isNaN(eventId) ? await getEvent(eventId) : null
-    if (event === null) return new Response(JSON.stringify({ message: `Invalid event ID.` }), { status: 400 })
+    if (event === null) return redirect(`/${lang}/events`)
 
     // verify that the event can be attended
-    if (!isEventInProgress(event)) return new Response(JSON.stringify({ message: `Event cannot be attended` }), { status: 400 })
+    if (!isEventInProgress(event)) return redirect(`/${lang}/events`)
 
     // verify session
     const session = await getActiveSession(cookies())
@@ -25,7 +28,7 @@ export async function GET(
 
     // verify that the user hasn't already attended the event
     const userEmail = session.user.email
-    if (await hasUserAttendedEvent(eventId, userEmail)) return new Response(JSON.stringify({ message: `Event already attended` }), { status: 400 })
+    if (await hasUserAttendedEvent(eventId, userEmail)) return redirect(`/${lang}/events`)
 
     // attend the event
     await attendEvent(
@@ -34,7 +37,7 @@ export async function GET(
     )
 
     // redirect to the event's page
-    return new Response(null, { status: 200 })
+    return redirect(`/${lang}/events/${eventId}`)
 }
 
 export async function DELETE(

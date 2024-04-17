@@ -153,17 +153,20 @@ describe('Database', () => {
         {
             id: 1,
             name: 'Normal',
-            points: 1
+            points: 1,
+            memberPoints: 2,
         },
         {
             id: 2,
             name: 'Educational',
-            points: 2
+            points: 2,
+            memberPoints: 3,
         },
         {
             id: 3,
             name: 'Officer',
-            points: 0
+            points: 0,
+            memberPoints: 0,
         },
     ]
 
@@ -193,7 +196,8 @@ describe('Database', () => {
     test('can insert an EventType', async () => {
         const newEventType = await insertEventType({
             name: 'Department',
-            points: 0
+            points: 0,
+            memberPoints: 0,
         })
         const id = newEventType.id
 
@@ -203,14 +207,16 @@ describe('Database', () => {
         expect(newEventType).toEqual({
             id: id,
             name: 'Department',
-            points: 0
+            points: 0,
+            memberPoints: 0
         })
     })
 
     test('can update an EventType', async () => {
         const newEventType = await insertEventType({
             name: 'Department',
-            points: 0
+            points: 0,
+            memberPoints: 0,
         })
         const id = newEventType.id
 
@@ -226,14 +232,16 @@ describe('Database', () => {
         expect(updated).toEqual({
             id: id,
             name: 'Department(s)',
-            points: 0
+            points: 0,
+            memberPoints: 0
         })
     })
 
     test('can delete an EventType', async () => {
         const newEventType = await insertEventType({
             name: 'Department',
-            points: 0
+            points: 0,
+            memberPoints: 0,
         })
         await deleteEventType(newEventType.id)
         return true
@@ -247,7 +255,8 @@ describe('Database', () => {
         startDate: dateNow,
         endDate: new Date(dateNow.getTime() + 100000),
         type: defaultEventTypes[0],
-        accessLevel: AccessLevel.NON_MEMBER
+        accessLevel: AccessLevel.NON_MEMBER,
+        body: ''
     } as Event
 
     test('can insert an event', async () => {
