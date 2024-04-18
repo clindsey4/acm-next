@@ -34,8 +34,10 @@ export default async function Announcement(
 
     async function formDeleteNews() {
         'use server'
-        await deleteNews(params.newsId)
-        redirect("./")
+        if (accessLevel >= AccessLevel.OFFICER) {
+            await deleteNews(params.newsId)
+            redirect("./")
+        }
     }
 
     return (
