@@ -43,3 +43,6 @@ next-env.d.ts
 .dockerignore
 Dockerfile
 fly.toml
+
+# database
+src/data/databaseweb_data.db
