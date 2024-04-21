@@ -5,6 +5,8 @@ import { cookies } from "next/headers"
 import { createEventMinAccessLevel } from "@/lib/utils"
 import { redirect } from "next/navigation"
 import { getEventType, insertEvent } from "@/data/webData"
+import { sendNotification } from "@/lib/onesignal"
+import { title } from "process"
 
 export interface EventActionState {
     error?: string
@@ -61,6 +63,13 @@ export async function createEvent(prevState: EventActionState, formData: FormDat
             error: error?.message || 'Error when creating event.'
         } as EventActionState
     }
+
+    // send notification
+    let notifResponse = sendNotification({
+        name: formFields.title.toString(),
+        heading: formFields.title.toString(),
+        content: formFields.location.toString()
+    });
 
     // redirect if allowed
     redirect(redirectTo)
