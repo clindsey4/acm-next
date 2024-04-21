@@ -13,6 +13,8 @@ import { Locale, getDictionary } from "@/localization";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { writeFile } from 'fs'
+import { getClient, sendNotification } from "@/lib/onesignal";
+import { Notification } from "@onesignal/node-onesignal";
 
 const rootDirectory = process.cwd()
 const imagesDirectory = rootDirectory + (process.env.DATABASE_LOCATION || '/src/data/database/') + 'images/'
@@ -66,6 +68,13 @@ export default async function CreateAnnouncement(
                     console.log(err)
             })
         }
+
+        // send notification
+        let notifResponse = await sendNotification({
+            name: title.toString(),
+            heading: title.toString(),
+            content: subject == null ? '' : subject.toString()
+        });
 
         redirect("/news")
     }
