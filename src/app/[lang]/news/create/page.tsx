@@ -13,8 +13,8 @@ import { Locale, getDictionary } from "@/localization";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { writeFile } from 'fs'
-import { getClient, sendNotification } from "@/lib/onesignal";
-import { Notification } from "@onesignal/node-onesignal";
+import { sendNotification } from "@/lib/onesignal";
+import { createNewsMinAccessLevel } from "@/lib/utils";
 
 const rootDirectory = process.cwd()
 const imagesDirectory = rootDirectory + (process.env.DATABASE_LOCATION || '/src/data/database/') + 'images/'
@@ -29,12 +29,16 @@ export default async function CreateAnnouncement(
     }
 ) {
     const langDict = await getDictionary(params.lang)
+    const session = await getActiveSession(cookies())
+    const accessLevel = session ? session.user.accessLevel : AccessLevel.NON_MEMBER
+    if (accessLevel < createNewsMinAccessLevel)
+        redirect("./")
 
     async function createAnnouncment(formData: FormData) {
         'use server'
         const session = await getActiveSession(cookies())
         const accessLevel = session ? session.user.accessLevel : AccessLevel.NON_MEMBER
-        if (accessLevel <= AccessLevel.NON_MEMBER)
+        if (accessLevel < createNewsMinAccessLevel)
             redirect("./")
 
         const title = formData.get('title')
