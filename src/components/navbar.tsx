@@ -49,6 +49,11 @@ export default function Navbar(
             href: `/${lang}/about`,
             text: langDict.nav_about
         },
+        {
+            icon: 'download',
+            href: 'https://github.com/djimenezmsu/acmNative/releases/latest/download/universal-android-release.apk',
+            text: langDict.nav_download
+        }
     ]
 
     // set user to null if when the path changes, the session cookie is null
