@@ -124,5 +124,8 @@
     "theme_dark": "Dark",
     "theme_light": "Light",
     "privacy_policy": "Privacy Policy",
-    "data_deletion": "Data Deletion"
+    "data_deletion": "Data Deletion",
+    "data_deletion_header": "Deleting your data will erase your user data and current session.",
+    "data_deletion_no_session": "Must be signed in to delete user data.",
+    "delete_data": "Delete Data"
 }

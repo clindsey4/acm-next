@@ -124,5 +124,8 @@
     "theme_dark": "Sombre",
     "theme_light": "Clair",
     "privacy_policy": "Politique de confidentialité",
-    "data_deletion": "Suppression de données"
+    "data_deletion": "Suppression de données",
+    "data_deletion_header": "",
+    "data_deletion_no_session": "Vous devez être connecté pour supprimer des données utilisateur.",
+    "delete_data": ""
 }

@@ -20,9 +20,10 @@ export default async function DataDeletion(
 
   async function deleteData(formData: FormData) {
     'use server'
+    const session = await getActiveSession(cookies())
     if (session == null)
       return redirect("./")
-    if (session.user != null && session.user.email != null) {
+    if (session.user && session.user.email) {
       deleteUser(session.user.email)
     }
     redirect("./")
@@ -30,14 +31,14 @@ export default async function DataDeletion(
   
   if (session == null)
     return (
-      <p>Must be signed in to delete user data.</p>
+      <h2 className="w-full text-center text-3xl md:text-4xl font-normal md:font-bold mt-5">{langDict.data_deletion_no_session}</h2>
     )
   return (
     <form action={deleteData} className="w-full flex flex-col gap-5 justify-center items-center">
-      <h1 className="text-on-surface font-bold text-2xl text-center">Deleting your data will erase your user data and current session.</h1>
+      <h1 className="text-on-surface font-bold text-2xl text-center">{langDict.data_deletion_header}</h1>
       <section className="max-w-lg flex flex-col gap-5 justify-center">
-        <FilledButton href="../PrivacyPolicy.pdf" text="Privacy and Data Deletion Policy"/>
-        <FilledButton text="Delete Data" />
+        <FilledButton href="../PrivacyPolicy.pdf" text={langDict.privacy_policy}/>
+        <FilledButton text={langDict.delete_data} />
       </section>
     </form>
   )

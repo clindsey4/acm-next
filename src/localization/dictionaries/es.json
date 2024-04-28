@@ -124,5 +124,8 @@
     "theme_dark": "Oscuro",
     "theme_light": "Claro",
     "privacy_policy": "Política de Privacidad",
-    "data_deletion": "Eliminación de Datos"
+    "data_deletion": "Eliminación de Datos",
+    "data_deletion_header": "",
+    "data_deletion_no_session": "Debe haber iniciado sesión para eliminar los datos del usuario.",
+    "delete_data": ""
 }

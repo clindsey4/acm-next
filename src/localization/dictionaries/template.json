@@ -124,5 +124,8 @@
     "theme_dark": "",
     "theme_light": "",
     "privacy_policy": "",
-    "data_deletion": ""
+    "data_deletion": "",
+    "data_deletion_header": "",
+    "data_deletion_no_session": "",
+    "delete_data": ""
 }

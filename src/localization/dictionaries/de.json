@@ -124,5 +124,8 @@
     "theme_dark": "Dunkel",
     "theme_light": "Hell",
     "privacy_policy": "Datenschutzrichtlinie",
-    "data_deletion": "Datenlöschung"
+    "data_deletion": "Datenlöschung",
+    "data_deletion_header": "",
+    "data_deletion_no_session": "Sie müssen angemeldet sein, um Benutzerdaten zu löschen.",
+    "delete_data": ""
 }
