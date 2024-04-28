@@ -84,12 +84,9 @@ export default async function EventsPage(
                 text={langDict.events_title}
                 actions={accessLevel >= createEventMinAccessLevel ? <FilledButton className="hidden md:flex" text={langDict.create_post} href='./events/create' /> : undefined}
             />
-            <FloatingActionButton
-                icon="add"
-                title={langDict.create_post}
-                href="./events/create"
-                className="md:hidden flex"
-            />
+            {
+                accessLevel >= createEventMinAccessLevel ? <FloatingActionButton icon="add" title={langDict.create_post} href="./events/create" className="md:hidden flex" /> : undefined
+            }
             <Divider />
 
             {upcomingEvent ? (

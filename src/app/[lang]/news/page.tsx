@@ -60,12 +60,9 @@ export default async function Newsfeed(
                 text={langDict.nav_news}
                 actions={(accessLevel >= createNewsMinAccessLevel)? <FilledButton className="hidden md:flex" text={langDict.news_new_post} href="./news/create" /> : undefined}
             />
-            <FloatingActionButton
-                icon="add"
-                title={langDict.news_new_post}
-                href="./news/create"
-                className="md:hidden flex"
-            />
+            {
+                accessLevel >= createNewsMinAccessLevel ? <FloatingActionButton icon="add" title={langDict.news_new_post} href="./news/create" className="md:hidden flex"/> : undefined
+            }
             <Divider />
             {
                 sections.map(section => {
