@@ -37,3 +37,12 @@ next-env.d.ts
 
 # database
 /src/data/database
+
+#uploaded images
+/public/media_images/*
+.dockerignore
+Dockerfile
+fly.toml
+
+# database
+src/data/databaseweb_data.db

@@ -1,4 +1,4 @@
-import { Session, User } from "@/data/types";
+import { AccessLevel, Session, User } from "@/data/types";
 import { deleteSession, getSession, insertSession, updateSession } from "@/data/webData";
 import { Credentials, OAuth2Client } from "google-auth-library";
 import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
@@ -108,4 +108,39 @@ export async function generateSession(
     })
 
     return session
+}
+
+/**
+ * Logs out an active sesssion
+ * 
+ * @param token The active session's token.
+ * @param cookies The cookies object to save the session token to.
+ * @returns A promise that resolves when logged out.
+ */
+export async function logout(
+    token: string,
+    cookies: ReadonlyRequestCookies,
+    cookieName: string = defaultCookieName
+): Promise<void> {
+    await deleteSession(token)
+
+    cookies.delete(cookieName)
+}
+
+/**
+ * Gets the default access level for a given email.
+ * 
+ * @param email The email to get the default access level of.
+ * @returns The default access level of the email.
+ */
+export function getEmailDefaultAccessLevel(
+    email: string
+): AccessLevel {
+    for (const advisor_email of (process.env.DEFAULT_ADVISORS || '').split(',')) {
+        if (advisor_email.trim() === email) return AccessLevel.ADVISOR
+    }
+    for (const officer_email of (process.env.DEFAULT_OFFICERS || '').split(',')) {
+        if (officer_email.trim() === email) return AccessLevel.OFFICER
+    }
+    return AccessLevel.NON_MEMBER
 }

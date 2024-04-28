@@ -17,7 +17,7 @@ export default async function Home(
 
   return (
     <article className="w-full flex flex-col gap-5 items-center justify-center pt-9">
-      <section className="w-full flex flex-col justify-start items-center gap-8 mt-28">
+      <section className="w-full flex flex-col justify-start items-center gap-8 md:mt-20">
         <Image
           className="w-full max-w-32"
           src='/acm-logo.png'
@@ -31,28 +31,29 @@ export default async function Home(
           className="sm:w-fit w-full"
         />
       </section>
-      <section className="w-full max-w-7xl mt-16"><ul className="w-full flex gap-5 flex-wrap">
-        <HomeCard
-          title={langDict.home_events_title}
-          description={langDict.home_events_description}
-          href="/events"
-        />
-        <HomeCard
-          title={langDict.home_news_title}
-          description={langDict.home_news_description}
-          href="/news"
-        />
-        <HomeCard
-          title={langDict.home_about_title}
-          description={langDict.home_about_description}
-          href="/about"
-        />
-        <HomeCard
-          title={langDict.home_join_title}
-          description={langDict.home_join_description}
-          href="/join"
-        />
-      </ul>
+      <section className="w-full max-w-7xl mt-16">
+        <ul className="w-full flex gap-5 flex-wrap">
+          <HomeCard
+            title={langDict.home_events_title}
+            description={langDict.home_events_description}
+            href="/events"
+          />
+          <HomeCard
+            title={langDict.home_news_title}
+            description={langDict.home_news_description}
+            href="/news"
+          />
+          <HomeCard
+            title={langDict.home_about_title}
+            description={langDict.home_about_description}
+            href="/about"
+          />
+          <HomeCard
+            title={langDict.home_join_title}
+            description={langDict.home_join_description}
+            href="/join"
+          />
+        </ul>
       </section>
     </article>
   )
@@ -70,9 +71,11 @@ function HomeCard(
   }
 ) {
   return (
-    <li className="md:flex-1 w-full min-w-56"><Link href={href} className="p-5 text-on-surface hover:text-primary flex flex-col gap-3 border-outline-variant transition-colors border rounded-3xl hover:bg-surface-container-lowest">
-      <h4 className="text-lg w-full font-bold text-inherit transition-colors">{title}</h4>
-      <p className="text-md text-on-surface-variant w-full">{description}</p>
-    </Link></li>
+    <li className="md:flex-1 w-full min-w-56">
+      <Link href={href} className="p-5 h-full text-on-surface hover:text-primary flex flex-col gap-3 border-outline-variant transition-colors border rounded-3xl hover:bg-surface-container-lowest">
+        <h4 className="text-lg w-full font-bold text-inherit transition-colors">{title}</h4>
+        <p className="text-md text-on-surface-variant w-full">{description}</p>
+      </Link>
+    </li>
   )
 }

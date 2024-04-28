@@ -1,6 +1,6 @@
 'use client'
 import { User } from "@/data/types"
-import { MouseEventHandler, useState } from "react"
+import { MouseEventHandler, useEffect, useState } from "react"
 import { useLocale } from "./providers/language-dict-provider"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
@@ -8,12 +8,13 @@ import { Icon } from "./material/icon"
 import { IconButton } from "./material/icon-button"
 import { ModalDrawer } from "./transitions/modal-drawer"
 import { FilledButton } from "./material/filled-button"
-import Image from "next/image"
+import { getCookie } from "cookies-next"
+import Image from "./image"
 
 export default function Navbar(
     {
         lang,
-        user
+        user: defaultUser
     }: {
         lang: string,
         user: User | null
@@ -21,6 +22,7 @@ export default function Navbar(
 ) {
 
     const [drawerOpen, setDrawerOpen] = useState(false)
+    const [user, setUser] = useState(defaultUser)
     const langDict = useLocale()
     const pathName = usePathname()
 
@@ -28,26 +30,39 @@ export default function Navbar(
 
     const navLinks: { icon: string, href: string, text: string }[] = [
         {
-            icon: 'menu',
+            icon: 'event',
             href: `/${lang}/events`,
             text: langDict.nav_events
         },
         {
-            icon: 'trending_up',
+            icon: 'newspaper',
             href: `/${lang}/news`,
             text: langDict.nav_news
         },
         {
-            icon: 'mic',
+            icon: 'group',
             href: `/${lang}/join`,
             text: langDict.nav_join
         },
         {
-            icon: 'music_note',
+            icon: 'help',
             href: `/${lang}/about`,
             text: langDict.nav_about
         },
+        {
+            icon: 'download',
+            href: 'https://github.com/djimenezmsu/acmNative/releases/latest/download/universal-android-release.apk',
+            text: langDict.nav_download
+        }
     ]
+
+    // set user to null if when the path changes, the session cookie is null
+    useEffect(() => {
+        const session = getCookie('session')?.toString()
+        if (!session) {
+            setUser(null)
+        }
+    }, [pathName])
 
     return (
         <header className="z-50 w-full h-15 px-7 py-2 box-border sticky top-0 backdrop-blur backdrop-saturate-200 before:w-full before:h-full before:absolute bg-[linear-gradient(var(--md-sys-color-background),transparent)] before:bg-background before:opacity-80 before:z-40 before:top-0 before:left-0">
@@ -64,14 +79,6 @@ export default function Navbar(
                             onClick={closeDrawer}
                         />)
                     }
-                    <NavDrawerLink
-                        key='settings'
-                        icon='settings'
-                        href={`/${lang}/settings`}
-                        text={langDict.settings_title}
-                        active={pathName === `/${lang}/settings`}
-                        onClick={closeDrawer}
-                    />
                 </ul>
             </ModalDrawer>
 
@@ -99,22 +106,19 @@ export default function Navbar(
                         </ul>
                     </div>
                 </ul>
-
-                {/* settings button */}
-                <IconButton icon='settings' className='sm:flex hidden' href={`/${lang}/settings`} />
                 
                 {/* login/account button */}
                 {user ? (
-                <Link href={`/${lang}/account`} className="h-8 w-8 rounded-full">
+                <Link href={`/${lang}/account`} className="h-8 w-8 my-1 rounded-full">
                     <Image
                         height={32}
                         width={32}
                         src={user.picture}
                         alt={user.givenName}
-                        className="rounded-full object-cover"
+                        className="rounded-full object-cover border border-outline-variant overflow-clip"
                     />
                 </Link>
-                ) : <FilledButton text={langDict.nav_login} href='/api/oauth' />}
+                ) : <FilledButton text={langDict.nav_login} href={`/api/oauth?refer=${pathName}`} />}
             </nav>
         </header>
     )

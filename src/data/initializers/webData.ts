@@ -30,28 +30,29 @@ export default function init(
         title TEXT NOT NULL,
         subject TEXT,
         body TEXT NOT NULL,
-        post_date TEXT NOT NULL,
-        image_url TEXT
+        post_date TEXT NOT NULL
     )`).run()
 
     // event types
     database.prepare(`CREATE TABLE IF NOT EXISTS event_types (
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         name TEXT NOT NULL,
-        points INTEGER NOT NULL
+        points INTEGER NOT NULL,
+        member_points INTEGER NOT NULL
     )`).run()
 
     // create default types
     if (!exists) {
-        database.prepare(`INSERT INTO event_types (name, points) VALUES (?, ?)`).run('Normal', 1)
-        database.prepare(`INSERT INTO event_types (name, points) VALUES (?, ?)`).run('Educational', 2)
-        database.prepare(`INSERT INTO event_types (name, points) VALUES (?, ?)`).run('Officer', 0)
+        database.prepare(`INSERT INTO event_types (name, points, member_points) VALUES (?, ?, ?)`).run('Normal', 1, 2)
+        database.prepare(`INSERT INTO event_types (name, points, member_points) VALUES (?, ?, ?)`).run('Educational', 2, 3)
+        database.prepare(`INSERT INTO event_types (name, points, member_points) VALUES (?, ?, ?)`).run('Officer', 0, 0)
     }
 
     // events
     database.prepare(`CREATE TABLE IF NOT EXISTS events (
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         title TEXT NOT NULL,
+        body TEXT NOT NULL,
         location TEXT NOT NULL,
         start_date TEXT NOT NULL,
         end_date TEXT NOT NULL,
@@ -59,5 +60,25 @@ export default function init(
         access_level INTEGER NOT NULL,
         FOREIGN KEY (type) REFERENCES event_types (id) ON DELETE SET NULL
     )`).run()
+
+    // events attendance
+    database.prepare(`CREATE TABLE IF NOT EXISTS events_attendance (
+        event_id INTEGER NOT NULL,
+        user_email TEXT NOT NULL,
+        PRIMARY KEY (event_id, user_email),
+        FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_email) REFERENCES users (email) ON DELETE CASCADE 
+    )`).run()
+
+    // docs
+    database.prepare(`CREATE TABLE IF NOT EXISTS docs (
+        key STRING PRIMARY KEY NOT NULL,
+        value STRING NOT NULL
+    )`).run()
+
+    // insert default document
+    if (!exists) {
+        database.prepare('INSERT INTO docs (key, value) VALUES (?, ?)').run('about', '')
+    }
 
 }

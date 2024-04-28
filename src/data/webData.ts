@@ -1,10 +1,26 @@
 import { randomBytes } from "crypto";
 import getDatabase from ".";
-import { AccessLevel, Databases, RawUser, User, RawSession, Session, RawNews, News, EventType, Id, RawEvent, Event, EventFilterParams, FilterDirection, EventFilterResult, RawFilterEvent } from "./types";
+import { AccessLevel, Databases, RawUser, User, RawSession, Session, RawNews, News, EventType, Id, RawEvent, Event, EventFilterParams, FilterDirection, EventFilterResult, RawFilterEvent, RawEventAttendance, EventAttendance, EventsAttendanceFilterParams, EventsAttendanceFilterResults, RawFilterEventAttendance, EventsAttendancePointsFilterParams, EventsAttendancePointsFilterResults, RawEventsAttendancePointsFilterResult, EventsAttendancePointsFilterResult, UsersFilterParams, UsersFilterResults, RawFilterUser, RawEventType } from "./types";
 
 
 // import database
 const db = getDatabase(Databases.WEB_DATA)
+
+function buildInStatement(
+    values: any[],
+    queryParams: { [key: string]: any },
+    prefix: string = '',
+) {
+    const stringBuilder = []
+    let n = 0
+    for (const value of values) {
+        const key = `${prefix}${n}`
+        stringBuilder.push(`:${key}`)
+        queryParams[key] = value
+        n++
+    }
+    return stringBuilder.join(',')
+}
 
 // ----- USERS -----
 
@@ -59,6 +75,65 @@ export function getUser(
     return new Promise((resolve, reject) => {
         try {
             resolve(getUserSync(email))
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+/**
+ * Synchronously filters the database based on various filter parameters to find users.
+ * 
+ * @param filterParams The filter params to filter the users on.
+ * @returns A filter result.
+ */
+function filterUsersSync(
+    filterParams: UsersFilterParams
+): UsersFilterResults {
+
+    const queryParams: { [key: string]: any } = {
+        search: filterParams.search ? `%${filterParams.search}%` : null,
+        familyName: filterParams.familyName ? `%${filterParams.familyName}%` : null,
+        givenName: filterParams.givenName ? `%${filterParams.givenName}%` : null,
+        accessLevel: filterParams.accessLevel === undefined ? null : filterParams.accessLevel,
+        offset: filterParams.offset || 0,
+        maxEntries: filterParams.maxEntries || 50,
+        direction: filterParams.direction == undefined ? FilterDirection.DESCENDING : filterParams.direction
+    }
+
+    const dbResult = db.prepare(`
+    SELECT 
+        email, given_name, family_name, picture, access_level,
+        COUNT(*) OVER() as total_count
+    FROM users
+    WHERE (:search IS NULL OR (lower(users.family_name || users.given_name) LIKE lower(:search)) OR (lower(users.email) LIKE lower(:search)))
+        AND (:familyName IS NULL OR users.family_name LIKE :familyName)
+        AND (:givenName IS NULL OR users.given_name LIKE :givenName)
+        AND (:accessLevel IS NULL OR users.access_level = :accessLevel)
+    ORDER BY
+        CASE WHEN :direction = 0 THEN 1 ELSE family_name END ASC,
+        CASE WHEN :direction = 1 THEN 1 ELSE family_name END DESC
+    LIMIT :maxEntries
+    OFFSET :offset`).all(queryParams) as RawFilterUser[]
+
+    return {
+        totalCount: dbResult[0] ? dbResult[0].total_count : 0,
+        results: dbResult.map(raw => buildUser(raw))
+    }
+}
+
+/**
+ * Flters the database based on various filter parameters to find users.
+ * 
+ * @param filterParams The filter params to filter the users on.
+ * @returns A promise that resolves with a filter result.
+ */
+export function filterUsers(
+    filterParams: UsersFilterParams
+): Promise<UsersFilterResults> {
+    return new Promise<UsersFilterResults>((resolve, reject) => {
+        try {
+            resolve(filterUsersSync(filterParams))
         } catch (error) {
             reject(error)
         }
@@ -368,7 +443,7 @@ function updateSessionSync(
         if (field && value !== undefined) {
             sets.push(`${field} = ?`) // create set value
             // convert value to a type storable in the database, and add it to the values array.
-            switch(field) {
+            switch (field) {
                 case 'google_tokens':
                     values.push(JSON.stringify(value))
                     break;
@@ -457,8 +532,7 @@ function buildNews(rawNews: RawNews): News {
         title: rawNews.title,
         subject: rawNews.subject,
         body: rawNews.body,
-        postDate: new Date(rawNews.post_date),
-        imageURL: rawNews.image_url
+        postDate: new Date(rawNews.post_date)
     } as News
 }
 
@@ -472,13 +546,13 @@ function getNewsSync(
     id: number
 ): News | null {
     let rawData = db.prepare(`
-    SELECT id, title, subject, body, post_date, image_url FROM news 
+    SELECT id, title, subject, body, post_date FROM news 
     WHERE id = ?
     `)
-    .get(id) as RawNews | null
+        .get(id) as RawNews | null
 
     if (!rawData) return null
-    
+
     return buildNews(rawData)
 }
 
@@ -512,11 +586,11 @@ function getNewsfeedSync(
     page: number
 ): News[] {
     let rawData = db.prepare(`
-    SELECT id, title, subject, body, post_date, image_url FROM news 
+    SELECT id, title, subject, body, post_date FROM news 
     ORDER BY post_date DESC, Id DESC
     LIMIT ? OFFSET ? 
     `)
-    .all(limit, limit * (page - 1)) as RawNews[]
+        .all(limit, limit * (page - 1)) as RawNews[]
 
     return rawData.map(buildNews) as News[]
 }
@@ -555,15 +629,14 @@ function insertNewsSync(
     title: string,
     subject: string | null,
     body: string,
-    postDate: Date,
-    imageURL: string | null
+    postDate: Date
 ): number {
     let newsId = db.prepare(`
-    INSERT INTO news (title, subject, body, post_date, image_url)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO news (title, subject, body, post_date)
+    VALUES (?, ?, ?, ?)
     `)
-    .run(title, subject, body, postDate.toISOString(), imageURL)
-    .lastInsertRowid
+        .run(title, subject, body, postDate.toISOString())
+        .lastInsertRowid
 
     return Number(newsId)
 }
@@ -582,12 +655,11 @@ export function insertNews(
     title: string,
     subject: string | null,
     body: string,
-    postDate: Date,
-    imageURL: string | null
+    postDate: Date
 ): Promise<number> {
     return new Promise<number>((resolve, reject) => {
         try {
-            resolve(insertNewsSync(title, subject, body, postDate, imageURL))
+            resolve(insertNewsSync(title, subject, body, postDate))
         } catch (error) {
             reject(error)
         }
@@ -604,10 +676,10 @@ function updateNewsSync(
     news: News
 ): boolean {
     db.prepare(`
-    UPDATE news SET title = ?, subject = ?, body = ?, post_date = ?, image_url = ?
+    UPDATE news SET title = ?, subject = ?, body = ?, post_date = ?
     WHERE id = ?
     `)
-    .run(news.title, news.subject, news.body, news.postDate.toISOString(), news.imageURL, news.id)
+        .run(news.title, news.subject, news.body, news.postDate.toISOString(), news.id)
 
     return true
 }
@@ -618,7 +690,7 @@ function updateNewsSync(
  * @param news
  * @returns true on success
  */
-export function updateNews (
+export function updateNews(
     news: News
 ): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
@@ -643,7 +715,7 @@ function deleteNewsSync(
     DELETE FROM news 
     WHERE id = ?
     `)
-    .run(id)
+        .run(id)
 
     return true
 }
@@ -669,6 +741,23 @@ export function deleteNews(
 // ----- EVENT TYPES --------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
+ * Converts a RawEventType object into an EventType object.
+ * 
+ * @param raw The RawEventType object to convert.
+ * @returns The converted EventType object.
+ */
+function buildEventType(
+    raw: RawEventType
+): EventType {
+    return {
+        id: raw.id,
+        name: raw.name,
+        points: raw.points,
+        memberPoints: raw.member_points
+    }
+}
+
+/**
  * Synchronously gets the event type associated with the provided id.
  * 
  * @param id The ID of the event type to get.
@@ -677,11 +766,13 @@ export function deleteNews(
 function getEventTypeSync(
     id: Id
 ): EventType | null {
-    return db.prepare(`
-    SELECT id, name, points
+    const raw = db.prepare(`
+    SELECT id, name, points, member_points
     FROM event_types
     WHERE id = ?
-    `).get(id) as EventType | null
+    `).get(id) as RawEventType | null
+
+    return raw === null ? null : buildEventType(raw)
 }
 
 /**
@@ -708,10 +799,10 @@ export function getEventType(
  * @returns An array of EventType objects.
  */
 function getAllEventTypesSync(): EventType[] {
-    return db.prepare(`
-    SELECT id, name, points
+    return (db.prepare(`
+    SELECT id, name, points, member_points
     FROM event_types
-    `).all() as EventType[]
+    `).all() as RawEventType[]).map(raw => buildEventType(raw))
 }
 
 /**
@@ -740,11 +831,12 @@ function insertEventTypeSync(
 ): EventType {
 
     const eventTypeId = db.prepare(`
-    INSERT INTO event_types (name, points)
-    VALUES (?, ?)
+    INSERT INTO event_types (name, points, member_points)
+    VALUES (?, ?, ?)
     `).run(
         eventType.name,
-        eventType.points
+        eventType.points,
+        eventType.memberPoints
     ).lastInsertRowid
 
     const returnEventType = eventType as EventType
@@ -791,9 +883,15 @@ function updateEventTypeSync(
     }
 
     // points
-    if (eventType.points) {
+    if (eventType.points !== undefined) {
         sets.push('points = ?')
         values.push(eventType.points)
+    }
+
+    // member points
+    if (eventType.memberPoints !== undefined) {
+        sets.push('member_points = ?')
+        values.push(eventType.memberPoints)
     }
 
     // build the SQL query to update the desired values
@@ -870,6 +968,7 @@ function buildEvent(
     return {
         id: rawEvent.id,
         title: rawEvent.title,
+        body: rawEvent.body,
         location: rawEvent.location,
         startDate: new Date(rawEvent.start_date),
         endDate: new Date(rawEvent.end_date),
@@ -899,7 +998,8 @@ function filterEventsSync(
 
     const rawEvents = db.prepare(`
     SELECT id, 
-        title, 
+        title,
+        body,
         location, 
         start_date, 
         end_date, 
@@ -907,8 +1007,8 @@ function filterEventsSync(
         access_level,
         COUNT(*) OVER() as total_count
     FROM events
-    WHERE (:fromDate IS NULL OR DATE(start_date) >= DATE(:fromDate))
-        AND (:toDate IS NULL OR DATE(:toDate) > DATE(end_date))
+    WHERE (:fromDate IS NULL OR end_date > :fromDate)
+        AND (:toDate IS NULL OR :toDate >= end_date)
         AND (:accessLevel IS NULL OR :accessLevel >= access_level)
     ORDER BY
         CASE WHEN :direction = 0 THEN 1 ELSE start_date END ASC,
@@ -950,7 +1050,7 @@ function getEventSync(
     id: Id
 ): Event | null {
     const rawEvent = db.prepare(`
-    SELECT id, title, location, start_date, end_date, type, access_level
+    SELECT id, title, body, location, start_date, end_date, type, access_level
     FROM events
     WHERE id = ?`).get(id) as RawEvent | null
 
@@ -985,10 +1085,11 @@ function insertEventSync(
     newEvent: Omit<Event, 'id'>
 ): Event {
     const eventId = db.prepare(`
-    INSERT INTO events (title, location, start_date, end_date, type, access_level)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO events (title, body, location, start_date, end_date, type, access_level)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
     `).run(
         newEvent.title,
+        newEvent.body,
         newEvent.location,
         newEvent.startDate.toISOString(),
         newEvent.endDate.toISOString(),
@@ -1031,6 +1132,7 @@ function updateEventSync(
     // maps the fields of the Event object to their database counterparts
     const fields: Record<string, string> = {
         title: 'title',
+        body: 'body',
         location: 'location',
         startDate: 'start_date',
         endDate: 'end_date',
@@ -1048,7 +1150,7 @@ function updateEventSync(
         if (field && value !== undefined) {
             sets.push(`${field} = ?`) // create set value
             // convert value to a type storable in the database, and add it to the values array.
-            switch(field) {
+            switch (field) {
                 case 'type':
                     values.push(value === null ? null : (value as EventType).id)
                     break;
@@ -1113,6 +1215,337 @@ export function deleteEvent(
     return new Promise<void>((resolve, reject) => {
         try {
             resolve(deleteEventSync(id))
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+// ----- EVENT ATTENDANCE --------------------------------------------------------------------------------------------------------------------------------------------
+
+/**
+ * Converts a RawEventAttendance object into an EventAttendance object.
+ * 
+ * @param rawAttendance The RawEventAttendance object to convert.
+ * @returns The converted EventAttendance object.
+ */
+function buildEventAttendance(
+    rawAttendance: RawEventAttendance
+): EventAttendance {
+    return {
+        eventId: rawAttendance.event_id,
+        userEmail: rawAttendance.user_email
+    }
+}
+
+/**
+ * Synchronously filters the events attendance database based on various parameters.
+ * 
+ * @param filterParams The parameters to refine the result with.
+ * @returns The filter result.
+ */
+function filterEventsAttendanceSync(
+    filterParams: EventsAttendanceFilterParams
+): EventsAttendanceFilterResults {
+
+    const queryParams: { [key: string]: any } = {
+        fromDate: filterParams.fromDate ? filterParams.fromDate.toISOString() : null,
+        toDate: filterParams.toDate ? filterParams.toDate.toISOString() : null,
+        offset: filterParams.offset || 0,
+        maxEntries: filterParams.maxEntries || 50,
+        direction: filterParams.direction == undefined ? FilterDirection.DESCENDING : filterParams.direction
+    }
+
+    const eventIdsValues = filterParams.eventIds ? buildInStatement(filterParams.eventIds, queryParams, "eventIds") : null
+    const userEmailsValues = filterParams.userEmails ? buildInStatement(filterParams.userEmails, queryParams, "userEmails") : null
+
+    const eventIdsStatement = eventIdsValues ? ` AND (event_id IN (${eventIdsValues}))` : ''
+    const userEmailsStatement = userEmailsValues ? ` AND (user_email IN (${userEmailsValues}))` : ''
+
+    const dbResult = db.prepare(`
+    SELECT event_id, user_email, COUNT(*) OVER() as total_count
+    FROM events_attendance
+    INNER JOIN events ON events.id = event_id
+    WHERE (:fromDate IS NULL OR events.end_date > :fromDate)
+        AND (:toDate IS NULL OR :toDate >= events.end_date)${eventIdsStatement}${userEmailsStatement}
+    ORDER BY
+        CASE WHEN :direction = 0 THEN 1 ELSE end_date END ASC,
+        CASE WHEN :direction = 1 THEN 1 ELSE end_date END DESC
+    LIMIT :maxEntries
+    OFFSET :offset`).all(queryParams) as RawFilterEventAttendance[]
+
+    return {
+        totalCount: dbResult[0] ? dbResult[0].total_count : 0,
+        results: dbResult.map(raw => buildEventAttendance(raw))
+    }
+}
+
+/**
+ * Filters the events attendance database based on various parameters.
+ * 
+ * @param filterParams The parameters to refine the result with.
+ * @returns A promise that resolves with the filter result.
+ */
+export function filterEventsAttendance(
+    filterParams: EventsAttendanceFilterParams
+): Promise<EventsAttendanceFilterResults> {
+    return new Promise((resolve, reject) => {
+        try {
+            resolve(filterEventsAttendanceSync(filterParams))
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+function filterEventsAttendancePointsSync(
+    filterParams: EventsAttendancePointsFilterParams
+): EventsAttendancePointsFilterResults {
+
+    const queryParams: { [key: string]: any } = {
+        fromDate: filterParams.fromDate ? filterParams.fromDate.toISOString() : null,
+        toDate: filterParams.toDate ? filterParams.toDate.toISOString() : null,
+        offset: filterParams.offset || 0,
+        maxEntries: filterParams.maxEntries || 50,
+        type: filterParams.type === undefined ? null : filterParams.type,
+        direction: filterParams.direction == undefined ? FilterDirection.DESCENDING : filterParams.direction
+    }
+
+    const eventIdsValues = filterParams.eventIds ? buildInStatement(filterParams.eventIds, queryParams, "eventIds") : null
+    const userEmailsValues = filterParams.userEmails ? buildInStatement(filterParams.userEmails, queryParams, "userEmails") : null
+
+    const eventIdsStatement = eventIdsValues ? ` AND (event_id IN (${eventIdsValues}))` : ''
+    const userEmailsStatement = userEmailsValues ? ` AND (user_email IN (${userEmailsValues}))` : ''
+
+    const dbResult = db.prepare(`
+    SELECT 
+        user_email, 
+        SUM(CASE WHEN users.access_level = 1 THEN event_types.member_points ELSE event_types.points END) AS points,
+        COUNT(*) OVER() as total_count
+    FROM events_attendance
+    INNER JOIN events ON events.id = event_id
+    INNER JOIN event_types ON event_types.id = events.type
+    INNER JOIN users ON users.email = user_email
+    WHERE (:fromDate IS NULL OR events.end_date > :fromDate)
+        AND (:toDate IS NULL OR :toDate >= events.end_date)
+        AND (:type IS NULL OR :type = event_types.id)${eventIdsStatement}${userEmailsStatement}
+    ORDER BY
+        CASE WHEN :direction = 0 THEN 1 ELSE end_date END ASC,
+        CASE WHEN :direction = 1 THEN 1 ELSE end_date END DESC
+    LIMIT :maxEntries
+    OFFSET :offset`).all(queryParams) as RawEventsAttendancePointsFilterResult[]
+
+    const results: EventsAttendancePointsFilterResult[] = []
+    let total_correct = 0
+    for (const raw of dbResult) {
+        const user = getUserSync(raw.user_email)
+        if (user) {
+            results.push({
+                user: user,
+                points: raw.points
+            })
+        } else {
+            total_correct += 1
+        }
+    }
+
+    return {
+        totalCount: dbResult[0] ? dbResult[0].total_count - total_correct : 0,
+        results: results
+    }
+}
+
+export function filterEventsAttendancePoints(
+    filterParams: EventsAttendancePointsFilterParams
+): Promise<EventsAttendancePointsFilterResults> {
+    return new Promise<EventsAttendancePointsFilterResults>((resolve, reject) => {
+        try {
+            resolve(filterEventsAttendancePointsSync(filterParams))
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+/**
+ * Synchronously attends an event as a specific user.
+ * 
+ * @param eventId The ID of the event to attend.
+ * @param userEmail The email of the user to attend as.
+ */
+function attendEventSync(
+    eventId: Id,
+    userEmail: string
+) {
+    db.prepare(`
+    INSERT INTO events_attendance (event_id, user_email)
+    VALUES (?, ?)
+    `).run(eventId, userEmail)
+}
+
+/**
+ * Attends an event as a specific user.
+ * 
+ * @param eventId The ID of the event to attend.
+ * @param userEmail The email of the user to attend as.
+ * @returns A promise that resolves when the event has been attended.
+ */
+export function attendEvent(
+    eventId: Id,
+    userEmail: string
+): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        try {
+            resolve(attendEventSync(eventId, userEmail))
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+/**
+ * Synchronously checks if a specific user has attended an event.
+ * 
+ * @param eventId The ID of the event to check.
+ * @param userEmail The email of the user to check the attendance of.
+ * @returns {boolean} A boolean; true if the user has attended the event, false otherwise.
+ */
+function hasUserAttendedEventSync(
+    eventId: Id,
+    userEmail: string
+): boolean {
+    return db.prepare(`
+    SELECT event_id, user_email
+    FROM events_attendance
+    WHERE event_id = ? AND user_email = ?
+    `).get(eventId, userEmail) !== undefined
+}
+
+/**
+ * Checks if a specific user has attended an event.
+ * 
+ * @param eventId The ID of the event to check.
+ * @param userEmail The email of the user to check the attendance of.
+ * @returns {boolean} A promise that resolves with a boolean; true if the user has attended the event, false otherwise.
+ */
+export function hasUserAttendedEvent(
+    eventId: Id,
+    userEmail: string
+): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+        try {
+            resolve(hasUserAttendedEventSync(eventId, userEmail))
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+/**
+ * Synchronously deletes the record of a user's attendance to an event.
+ * 
+ * @param eventId The ID of the event.
+ * @param userEmail The email of the user to remove the attendance of.
+ */
+function deleteEventAttendanceSync(
+    eventId: Id,
+    userEmail: string
+) {
+    db.prepare(`
+    DELETE FROM events_attendance
+    WHERE event_id = ? AND user_email = ?
+    `).run(eventId, userEmail)
+}
+
+/**
+ * Deletes the record of a user's attendance to an event.
+ * 
+ * @param eventId The ID of the event.
+ * @param userEmail The email of the user to remove the attendance of.
+ * @returns A promise that resolves when the attendance record is deleted.
+ */
+export function deleteEventAttendance(
+    eventId: Id,
+    userEmail: string
+): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        try {
+            resolve(deleteEventAttendanceSync(eventId, userEmail))
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+// ----- docs --------------------------------------------------------------------------------------------------------------------------------------------
+
+/**
+ * Synchronously gets a document from the database.
+ * 
+ * @param key The key of the document.
+ * @returns The value of the document.
+ */
+function getDocumentSync(
+    key: string
+): string | null {
+    const result = db.prepare(`
+    SELECT key, value
+    FROM docs
+    WHERE key = ?
+    `).get(key) as { key: string, value: string } | null
+
+    return result ? result.value : null
+}
+
+/**
+ * Gets a document from the database.
+ * 
+ * @param key The key of the document.
+ * @returns A promise that resolves with the value of the document or null.
+ */
+export function getDocument(
+    key: string
+): Promise<string | null> {
+    return new Promise<string | null>((resolve, reject) => {
+        try {
+            resolve(getDocumentSync(key))
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+/**
+ * Synchronously updates an existing document in the database.
+ * 
+ * @param key The key of the document to update.
+ * @param newValue The new value of the document.
+ */
+function updateDocumentSync(
+    key: string,
+    newValue: string
+) {
+    db.prepare(`
+    UPDATE docs
+    SET value = ?
+    WHERE key = ?
+    `).run(newValue, key)
+}
+
+/**
+ * Updates an existing document in the database.
+ * 
+ * @param key The key of the document to update.
+ * @param newValue The new value of the document.
+ * @returns A promise that resolves when the document has been updated.
+ */
+export function updateDocument(
+    key: string,
+    newValue: string
+): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        try {
+            resolve(updateDocumentSync(key, newValue))
         } catch (error) {
             reject(error)
         }

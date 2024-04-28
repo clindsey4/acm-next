@@ -7,6 +7,7 @@ import { Providers } from "@/components/providers/providers";
 import Navbar from "@/components/navbar";
 import { getActiveSession } from "@/lib/oauth";
 import { cookies } from "next/headers";
+import Footer from "@/components/footer/footer";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -47,9 +48,13 @@ export default async function RootLayout({
           <Navbar lang={locale} user={session ? session.user : null}/>
 
           {/* Main page content */}
-          <main className="max-w-6xl min-h-screen m-auto flex flex-col justify-start items-center px-5 py-6 box-border mt-5">
+          <main className="max-w-7xl min-h-screen m-auto flex flex-col justify-start items-center px-5 py-6 box-border mt-5">
             {children}
           </main>
+
+          {/* Footer */}
+          <Footer lang={locale}/>
+          
         </Providers>
       </body>
     </html>

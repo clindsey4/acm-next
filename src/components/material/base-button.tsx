@@ -9,14 +9,16 @@ export function BaseButton(
         href,
         onClick,
         className = '',
-        disabled
+        disabled,
+        prefetch = true
     }: {
         text: string,
         icon?: string,
         href?: string,
         onClick?: MouseEventHandler,
         className?: string,
-        disabled?: boolean
+        disabled?: boolean,
+        prefetch?: boolean
     }
 ) {
     const iconElement = icon ? <Icon icon={icon}/> : undefined
@@ -28,6 +30,7 @@ export function BaseButton(
                 className={`text-base h-10 rounded-full flex items-center justify-center relative before:transition-opacity before:absolute before:w-full before:h-full before:left-0 before:top-0 before:rounded-full before:opacity-0 before:hover:opacity-[0.12] transition-opacity ${icon ? 'pl-4 pr-6 gap-2' : 'px-6'} ${className}`}
                 href={href}
                 onClick={onClick}
+                prefetch={prefetch}
             >
                 {iconElement}
                 {text}

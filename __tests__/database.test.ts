@@ -2,13 +2,13 @@ import { AccessLevel, Event, EventType, News, User } from "@/data/types";
 import {
     deleteNews, getNews, getNewsfeed, insertNews, updateNews,
     getUser, insertUser, deleteUser, updateUser, userExists,
-    deleteSession, getSession, insertSession, updateSession, getEventType, getAllEventTypes, insertEventType, updateEventType, deleteEventType, insertEvent, deleteEvent, updateEvent, getEvent, filterEvents
+    deleteSession, getSession, insertSession, updateSession, getEventType, getAllEventTypes, insertEventType, updateEventType, deleteEventType, insertEvent, deleteEvent, updateEvent, getEvent, filterEvents, attendEvent, hasUserAttendedEvent, deleteEventAttendance, filterEventsAttendance
 } from "@/data/webData";
 
 describe('Database', () => {
     // users table tests
 
-    const user = {
+    const testUser = {
         email: 'jdoe@murraystate.edu',
         givenName: 'John',
         familyName: 'Doe',
@@ -16,7 +16,7 @@ describe('Database', () => {
         accessLevel: AccessLevel.NON_MEMBER
     } as User
 
-    const updatedUser = {
+    const updatedTestUser = {
         email: 'jdoe@murraystate.edu',
         givenName: 'Jane',
         familyName: 'Doe',
@@ -24,15 +24,15 @@ describe('Database', () => {
         accessLevel: AccessLevel.NON_MEMBER
     } as User
 
-    test('can insert a user', () => insertUser(user))
+    test('can insert a user', () => insertUser(testUser))
 
     test('can get a user', async () => {
-        const fetched = await getUser(user.email)
-        expect(fetched).toEqual(user)
+        const fetched = await getUser(testUser.email)
+        expect(fetched).toEqual(testUser)
     })
 
     test('can check if a user exists', async () => {
-        const exists = await userExists(user.email)
+        const exists = await userExists(testUser.email)
         expect(exists).toBe(true)
     })
 
@@ -47,12 +47,12 @@ describe('Database', () => {
             givenName: 'Jane'
         })
 
-        expect(updated).toEqual(updatedUser)
+        expect(updated).toEqual(updatedTestUser)
     })
 
     // sessions tests
     const toInsertSession = {
-        user: updatedUser,
+        user: updatedTestUser,
         googleTokens: { 'access_token': 'thisIsAnAccessToken' },
         expires: new Date()
     }
@@ -78,7 +78,7 @@ describe('Database', () => {
         expect(updated).toEqual({
             token: session.token,
             expires: toInsertSession.expires,
-            user: updatedUser,
+            user: updatedTestUser,
             googleTokens: { 'access_token': 'thisIsAnUpdatedAccessToken' }
         })
     })
@@ -89,10 +89,10 @@ describe('Database', () => {
         await deleteSession(session.token)
     })
 
-    test('can delete a user', () => deleteUser('jdoe@murraystate.edu')
-        .then(_ => true)
-        .catch(_ => false)
-    )
+    test('can delete a user', async () => {
+        await deleteUser(testUser.email)
+        return true
+    })
 
     // news table tests
     let newsRecordId = 0
@@ -102,8 +102,7 @@ describe('Database', () => {
             "Test Title",
             null,
             "Test Body",
-            testDate,
-            null
+            testDate
         )
             .then(newsId => {
                 newsRecordId = newsId
@@ -118,8 +117,7 @@ describe('Database', () => {
                 title: "Test Title",
                 subject: null,
                 body: "Test Body",
-                postDate: testDate,
-                imageURL: null
+                postDate: testDate
             } as News))
     })
 
@@ -129,8 +127,7 @@ describe('Database', () => {
             title: "Test Title",
             subject: "Test Subject",
             body: "Test Body",
-            postDate: testDate,
-            imageURL: null
+            postDate: testDate
         } as News)
             .then(result => expect(result).toBe(true))
     })
@@ -142,8 +139,7 @@ describe('Database', () => {
                 title: "Test Title",
                 subject: "Test Subject",
                 body: "Test Body",
-                postDate: testDate,
-                imageURL: null
+                postDate: testDate
             }))
     })
 
@@ -157,17 +153,20 @@ describe('Database', () => {
         {
             id: 1,
             name: 'Normal',
-            points: 1
+            points: 1,
+            memberPoints: 2,
         },
         {
             id: 2,
             name: 'Educational',
-            points: 2
+            points: 2,
+            memberPoints: 3,
         },
         {
             id: 3,
             name: 'Officer',
-            points: 0
+            points: 0,
+            memberPoints: 0,
         },
     ]
 
@@ -197,7 +196,8 @@ describe('Database', () => {
     test('can insert an EventType', async () => {
         const newEventType = await insertEventType({
             name: 'Department',
-            points: 0
+            points: 0,
+            memberPoints: 0,
         })
         const id = newEventType.id
 
@@ -207,14 +207,16 @@ describe('Database', () => {
         expect(newEventType).toEqual({
             id: id,
             name: 'Department',
-            points: 0
+            points: 0,
+            memberPoints: 0
         })
     })
 
     test('can update an EventType', async () => {
         const newEventType = await insertEventType({
             name: 'Department',
-            points: 0
+            points: 0,
+            memberPoints: 0,
         })
         const id = newEventType.id
 
@@ -230,14 +232,16 @@ describe('Database', () => {
         expect(updated).toEqual({
             id: id,
             name: 'Department(s)',
-            points: 0
+            points: 0,
+            memberPoints: 0
         })
     })
 
     test('can delete an EventType', async () => {
         const newEventType = await insertEventType({
             name: 'Department',
-            points: 0
+            points: 0,
+            memberPoints: 0,
         })
         await deleteEventType(newEventType.id)
         return true
@@ -251,7 +255,8 @@ describe('Database', () => {
         startDate: dateNow,
         endDate: new Date(dateNow.getTime() + 100000),
         type: defaultEventTypes[0],
-        accessLevel: AccessLevel.NON_MEMBER
+        accessLevel: AccessLevel.NON_MEMBER,
+        body: ''
     } as Event
 
     test('can insert an event', async () => {
@@ -317,6 +322,67 @@ describe('Database', () => {
         // delete
         deleteEvent(newEvent.id)
 
-        expect(filtered).toEqual([testEvent])
+        expect(filtered.results).toContainEqual(testEvent)
     })
+
+    // events attendance
+    test("can get attend event", async () => {
+        const newEvent = await insertEvent(testEvent)
+        const newUser = await insertUser(testUser)
+
+        await attendEvent(newEvent.id, newUser.email)
+
+        deleteEvent(newEvent.id)
+        deleteUser(newUser.email)
+        
+        return true
+    })
+
+    test("can get event attendance", async () => {
+        const newEvent = await insertEvent(testEvent)
+        const newUser = await insertUser(testUser)
+
+        await attendEvent(newEvent.id, newUser.email)
+
+        const attendance = await filterEventsAttendance({
+            eventIds: [newEvent.id]
+        })
+        
+        deleteEvent(newEvent.id)
+        deleteUser(newUser.email)
+
+        expect(attendance.results).toContainEqual({
+            eventId: newEvent.id,
+            userEmail: newUser.email
+        })
+    })
+
+    test("can check event attendance", async () => {
+        const newEvent = await insertEvent(testEvent)
+        const newUser = await insertUser(testUser)
+
+        await attendEvent(newEvent.id, newUser.email)
+
+        const didAttend = await hasUserAttendedEvent(newEvent.id, newUser.email)
+        
+        deleteEvent(newEvent.id)
+        deleteUser(newUser.email)
+
+        expect(didAttend).toEqual(true)
+    })
+
+    test("can delete event attendance", async () => {
+        const newEvent = await insertEvent(testEvent)
+        const newUser = await insertUser(testUser)
+
+        await attendEvent(newEvent.id, newUser.email)
+
+        await deleteEventAttendance(newEvent.id, newUser.email)
+        
+        deleteEvent(newEvent.id)
+        deleteUser(newUser.email)
+
+        return true
+    })
+
 })

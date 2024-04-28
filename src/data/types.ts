@@ -45,6 +45,25 @@ export interface User {
     accessLevel: AccessLevel
 }
 
+export interface RawFilterUser extends RawUser {
+    total_count: number
+}
+
+export interface UsersFilterParams {
+    search?: string
+    givenName?: string
+    familyName?: string
+    accessLevel?: number
+    offset?: number
+    maxEntries?: number
+    direction?: FilterDirection
+}
+
+export interface UsersFilterResults {
+    totalCount: number,
+    results: User[]
+}
+
 // sessions types
 export interface RawSession {
     token: string,
@@ -67,8 +86,7 @@ export interface RawNews {
     title: string,
     subject: string | null,
     body: string,
-    post_date: string,
-    image_url: string | null
+    post_date: string
 }
 
 export interface News {
@@ -76,21 +94,30 @@ export interface News {
     title: string,
     subject: string | null,
     body: string,
-    postDate: Date,
-    imageURL: string | null
+    postDate: Date
 }
 
 // event types types
+
+export interface RawEventType {
+    id: Id
+    name: string
+    points: number
+    member_points: number
+}
+
 export interface EventType {
     id: Id
     name: string
     points: number
+    memberPoints: number
 }
 
 // event types
 export interface RawEvent {
     id: Id
     title: string
+    body: string
     location: string
     start_date: string
     end_date: string
@@ -105,6 +132,7 @@ export interface RawFilterEvent extends RawEvent {
 export interface Event {
     id: Id
     title: string
+    body: string
     location: string
     startDate: Date
     endDate: Date
@@ -124,4 +152,61 @@ export interface EventFilterParams {
 export interface EventFilterResult {
     totalCount: number,
     results: Event[]
+}
+
+/* Event Attendance */
+export interface RawEventAttendance {
+    event_id: Id,
+    user_email: string
+}
+
+export interface RawFilterEventAttendance extends RawEventAttendance{
+    total_count: number
+}
+
+export interface EventAttendance {
+    eventId: Id,
+    userEmail: string
+}
+
+export interface EventsAttendanceFilterParams {
+    eventIds?: Id[],
+    userEmails?: string[],
+    fromDate?: Date
+    toDate?: Date
+    offset?: number
+    maxEntries?: number
+    direction?: FilterDirection
+}
+
+export interface EventsAttendanceFilterResults {
+    totalCount: number,
+    results: EventAttendance[]
+}
+
+export interface EventsAttendancePointsFilterParams {
+    eventIds?: Id[],
+    userEmails?: string[],
+    fromDate?: Date
+    toDate?: Date
+    type?: EventType
+    offset?: number
+    maxEntries?: number
+    direction?: FilterDirection
+}
+
+export interface EventsAttendancePointsFilterResults {
+    totalCount: number,
+    results: EventsAttendancePointsFilterResult[]
+}
+
+export interface RawEventsAttendancePointsFilterResult {
+    user_email: string,
+    points: number,
+    total_count: number
+}
+
+export interface EventsAttendancePointsFilterResult {
+    user: User,
+    points: number
 }

@@ -1,16 +1,22 @@
 import { getNewsfeed } from "@/data/webData";
-import { News } from "@/data/types"
+import { AccessLevel, News } from "@/data/types"
 import { NewsCard } from "@/components/news-card";
 import { Divider } from "@/components/material/divider";
 import { FilledButton } from "@/components/material/filled-button";
 import { Locale, getDictionary } from "@/localization";
 import { PageHeader } from "@/components/page-header";
+import { getActiveSession } from "@/lib/oauth";
+import { cookies } from "next/headers";
+import { FloatingActionButton } from "@/components/material/floating-action-button";
+import { createNewsMinAccessLevel } from "@/lib/utils";
 
 export default async function Newsfeed(
     {
-        lang
+        params
     }: {
-        lang: Locale
+        params: {
+            lang: Locale
+        }
     }
 ) {
     let data: News[] = []
@@ -39,18 +45,24 @@ export default async function Newsfeed(
 
     //Add each news to its appropriate section
     data.forEach(announcement => {
-        sections[2 * (maxYear - announcement.postDate.getFullYear()) + (announcement.postDate.getMonth() > 6 ? 0 : 1)].push(announcement)
+        sections[2 * (maxYear - announcement.postDate.getFullYear()) + (announcement.postDate.getMonth() > 5 ? 0 : 1)].push(announcement)
     })
 
     // get the language dictionary
-    const langDict = await getDictionary(lang)
+    const langDict = await getDictionary(params.lang)
+    const session = await getActiveSession(cookies())
+    const accessLevel = session ? session.user.accessLevel : AccessLevel.NON_MEMBER
+            
 
     return (
         <article className="w-full flex flex-col gap-5">
             <PageHeader
                 text={langDict.nav_news}
-                actions={<FilledButton text={langDict.news_new_post} href="/news/create" />}
+                actions={(accessLevel >= createNewsMinAccessLevel)? <FilledButton className="hidden md:flex" text={langDict.news_new_post} href="./news/create" /> : undefined}
             />
+            {
+                accessLevel >= createNewsMinAccessLevel ? <FloatingActionButton icon="add" title={langDict.news_new_post} href="./news/create" className="md:hidden flex"/> : undefined
+            }
             <Divider />
             {
                 sections.map(section => {
@@ -59,9 +71,9 @@ export default async function Newsfeed(
                     
                     const sectionIndex = sections.indexOf(section)
                     return (
-                        <section className="w-full max-w-6xl flex flex-col gap-5 text-on-surface" key={sectionIndex}>
+                        <section className="w-full flex flex-col gap-5 text-on-surface" key={sectionIndex}>
                             <h1 className="text-on-surface font-semibold text-3xl ">{(sectionIndex % 2 == 0 ? "Fall " : "Spring ") + Math.ceil(maxYear - sectionIndex / 2)}</h1>
-                            <ol className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-5 text-on-surface">
+                            <ol className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-5 text-on-surface">
                                 {
                                     section.map(announcement => {
                                         return <NewsCard news={announcement} buttonText={langDict.view_more} key={announcement.id} />
