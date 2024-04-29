@@ -120,7 +120,7 @@ export default async function EventsPage(
                     {eventInProgress && showQRCode ? <section className="flex-1 flex flex-col gap-3 w-full sm:flex-row justify-end sm:justify-start mt-2">{buttons}</section> : undefined}
                 </section>
                 {eventInProgress && showQRCode ? (
-                    <QRCode className="w-full h-full max-w-56 max-h-56 p-3 bg-white rounded-3xl" value={`https://msu-acm.fly.dev/api/events/attend?id=${event.id}`} />
+                    <QRCode className="w-full h-full max-w-56 max-h-56 p-3 bg-white rounded-3xl border border-outline-variant" value={`https://msu-acm.fly.dev/api/events/attend?id=${event.id}`} />
                 ) : (
                     <section className="flex-1 flex flex-col gap-3 sm:w-fit w-full sm:flex-row justify-end">{buttons}</section>
                 )}
