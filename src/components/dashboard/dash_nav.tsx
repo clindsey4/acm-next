@@ -34,12 +34,7 @@ export function DashboardNavigation(
             icon: 'group',
             href: `/${lang}/dash/attendance`,
             text: langDict.dash_nav_attendance
-        },
-        {
-            icon: 'workspaces',
-            href: `/${lang}/dash/social`,
-            text: langDict.dash_nav_social
-        },
+        }
     ]
 
     
