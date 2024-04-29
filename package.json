@@ -16,6 +16,7 @@
     "cookies-next": "^4.1.1",
     "crypto-js": "^4.2.0",
     "google-auth-library": "^9.7.0",
+    "instagram-private-api": "^1.46.1",
     "material-symbols": "^0.15.0",
     "negotiator": "^0.6.3",
     "next": "14.1.0",
