@@ -38,7 +38,7 @@ export function MarkdownInput(
             {
                 (showMarkdown) ?
                 <div className="w-full bg-surface-container rounded-2xl px-5 py-2">
-                    <Markdown className="text-on-surface prose prose-lg prose-material max-w-none break-words">
+                    <Markdown className="text-on-surface prose prose-lg prose-material max-w-full break-words">
                         {markdownValue ? markdownValue : "No message found"}
                     </Markdown>
                 </div>

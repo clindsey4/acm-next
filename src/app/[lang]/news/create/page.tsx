@@ -2,7 +2,6 @@ import { ImageInput } from "@/components/input/image-input";
 import { InputSection } from "@/components/input/input-section";
 import { MarkdownInput } from "@/components/input/markdown-input";
 import { TextInputElement } from "@/components/input/text-input";
-import { UTCDateInput } from "@/components/input/utc-date-input";
 import { Divider } from "@/components/material/divider";
 import { FilledButton } from "@/components/material/filled-button";
 import { PageHeader } from "@/components/page-header";
@@ -42,13 +41,12 @@ export default async function CreateAnnouncement(
             redirect("./")
 
         const title = formData.get('title')
-        const postDate = formData.get("date")
         const subject = formData.get("subject")
         const body = formData.get("body")
         const imageInput = formData.get("imageInput") as File
 
         //Don't create announcement if non nullable are null
-        if (title == null || body == null || postDate == "" || postDate == null)
+        if (title == null || body == null)
             return
 
         //Limit file size
@@ -60,7 +58,7 @@ export default async function CreateAnnouncement(
             title.toString(),
             subject == null ? null : subject.toString(),
             body.toString(),
-            new Date(postDate.toString())
+            new Date()
         )
 
         //Store file on server
@@ -74,7 +72,7 @@ export default async function CreateAnnouncement(
         }
 
         // send notification
-        let notifResponse = await sendNotification({
+        await sendNotification({
             name: title.toString(),
             heading: title.toString(),
             content: subject == null ? '' : subject.toString()
@@ -97,15 +95,10 @@ export default async function CreateAnnouncement(
             />
             <Divider />
             <section className="w-full flex flex-col lg:flex-row gap-5 justify-between items-start">
-                <ol className="w-full flex-1 flex flex-col gap-5 text-on-surface">
+                <ol className="w-full flex-1 flex flex-col gap-5 text-on-surface justify-between">
                     <li className="w-full flex flex-col gap-2 text-on-surface">
                         <InputSection title={langDict.news_title}>
                             <TextInputElement name="title" placeholder={langDict.news_title_placeholder} required />
-                        </InputSection>
-                    </li>
-                    <li className="w-full flex flex-col gap-2 text-on-surface">
-                        <InputSection title={langDict.news_date}>
-                            <UTCDateInput name="date" required />
                         </InputSection>
                     </li>
                     <li className="w-full flex flex-col gap-2 text-on-surface">
@@ -113,14 +106,17 @@ export default async function CreateAnnouncement(
                             <TextInputElement name="subject" placeholder={langDict.news_subject_placeholder} required />
                         </InputSection>
                     </li>
+                    <li>
+                      <MarkdownInput title={langDict.news_body} name="body" />
+                    </li>
                 </ol>
-                <section className="w-fit m-auto">
+                <section className="w-fit">
                     <InputSection title={langDict.news_image}>
                         <ImageInput name="imageInput" />
                     </InputSection>
                 </section>
             </section>
-            <MarkdownInput title={langDict.news_body} name="body" />
+            
         </form>
     )
 }
