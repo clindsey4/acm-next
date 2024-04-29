@@ -108,6 +108,18 @@
     "join_process": "",
     "join_process_fee": "",
     "join_process_details": "",
+    "app_title": "",
+    "app_sub_title": "",
+    "app_download_title": "",
+    "app_download_sub_title": "",
+    "app_download": "",
+    "app_features": "",
+    "app_features_push_title": "",
+    "app_features_push_description": "",
+    "app_features_view_title": "",
+    "app_features_view_description": "",
+    "app_features_speed_title": "",
+    "app_features_speed_description": "",
     "access_level_non_member": "",
     "access_level_member": "",
     "access_level_officer": "",
@@ -124,5 +136,8 @@
     "theme_dark": "",
     "theme_light": "",
     "privacy_policy": "",
-    "data_deletion": ""
+    "data_deletion": "",
+    "data_deletion_header": "",
+    "data_deletion_no_session": "",
+    "delete_data": ""
 }
