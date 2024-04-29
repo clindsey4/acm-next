@@ -38,6 +38,7 @@ export default async function Footer(
                         <section className="flex gap-7 justify-center items-center">
                             <FooterLink text={langDict.account_title} href={`${root}/account`} />
                             <FooterLink text={langDict.nav_news} href={`${root}/news`} />
+                            <FooterLink text={langDict.nav_download} href={`${root}/app`} />
                         </section>
                         <section className="flex gap-7 justify-center items-center">
                             <FooterLink text={langDict.privacy_policy} href="./PrivacyPolicy.pdf"/>

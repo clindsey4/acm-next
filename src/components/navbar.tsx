@@ -51,7 +51,7 @@ export default function Navbar(
         },
         {
             icon: 'download',
-            href: 'https://github.com/djimenezmsu/acmNative/releases/latest/download/universal-android-release.apk',
+            href: `/${lang}/app`,
             text: langDict.nav_download
         }
     ]
