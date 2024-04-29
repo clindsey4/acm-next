@@ -11,12 +11,11 @@ import { getActiveSession } from "@/lib/oauth";
 import { Locale, getDictionary } from "@/localization";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { writeFile } from 'fs'
 import { sendNotification } from "@/lib/onesignal";
 import { createNewsMinAccessLevel } from "@/lib/utils";
+import { createInstagramPost } from "@/app/actions/create-instagram-post";
 
 const rootDirectory = process.cwd()
-const imagesDirectory = rootDirectory + (process.env.DATABASE_LOCATION || '/src/data/database/') + 'images/'
 
 export default async function CreateAnnouncement(
     {
@@ -64,11 +63,9 @@ export default async function CreateAnnouncement(
         //Store file on server
         if (imageInput.size != 0) {
             const content = await imageInput.arrayBuffer()
-                .then(response => new Int8Array(response))
-            writeFile(imagesDirectory + newsId + '.jpg', content, (err) => {
-                if (err != null)
-                    console.log(err)
-            })
+                .then(response => new Buffer(response))
+
+            createInstagramPost(content, subject == null ? null : subject.toString())
         }
 
         // send notification
@@ -78,7 +75,7 @@ export default async function CreateAnnouncement(
             content: subject == null ? '' : subject.toString()
         });
 
-        redirect("/news")
+        redirect(`/news/${newsId}`)
     }
 
     return (
