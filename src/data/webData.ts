@@ -1329,6 +1329,7 @@ function filterEventsAttendancePointsSync(
     WHERE (:fromDate IS NULL OR events.end_date > :fromDate)
         AND (:toDate IS NULL OR :toDate >= events.end_date)
         AND (:type IS NULL OR :type = event_types.id)${eventIdsStatement}${userEmailsStatement}
+    GROUP BY user_email
     ORDER BY
         CASE WHEN :direction = 0 THEN 1 ELSE end_date END ASC,
         CASE WHEN :direction = 1 THEN 1 ELSE end_date END DESC
